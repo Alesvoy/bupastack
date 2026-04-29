@@ -1,0 +1,4 @@
+interface:
+  display_name: "Harness Engineering Plan"
+  short_description: "Turn asks into ExecPlans or task briefs"
+  default_prompt: "Use $harness-engineering-plan to decide whether this ask needs a task brief or an ExecPlan, then size plan work as ticket, sprint, or epic."

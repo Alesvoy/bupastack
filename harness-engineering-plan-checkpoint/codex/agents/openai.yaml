@@ -1,0 +1,4 @@
+interface:
+  display_name: "Harness Engineering Plan Checkpoint"
+  short_description: "Checkpoint ExecPlan progress and logs"
+  default_prompt: "Use $harness-engineering-plan-checkpoint to checkpoint this ExecPlan item and update the plan logs."

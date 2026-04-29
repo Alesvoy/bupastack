@@ -1,0 +1,4 @@
+interface:
+  display_name: "Harness Engineering Plan Resume"
+  short_description: "Resume one ExecPlan item with agents"
+  default_prompt: "Use $harness-engineering-plan-resume to resume the next ExecPlan item and run the agent loop."

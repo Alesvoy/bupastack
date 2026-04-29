@@ -1,0 +1,4 @@
+interface:
+  display_name: "Harness Engineering Track Task"
+  short_description: "Append capture-only entries to workspace inboxes"
+  default_prompt: "Use $harness-engineering-track-task to log this ask to the correct workspace INBOX.md without turning it into a plan."

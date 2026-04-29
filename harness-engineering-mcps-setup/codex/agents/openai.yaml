@@ -1,0 +1,7 @@
+interface:
+  display_name: "Harness Engineering MCP Setup"
+  short_description: "Recommend repo-needed MCPs and safe Codex setup"
+  default_prompt: "Use $harness-engineering-mcps-setup to inspect this repo, recommend the MCP capabilities it needs for accurate validation, and propose a safe project-scoped Codex configuration for the MCPs that are already available or fully specified."
+
+policy:
+  allow_implicit_invocation: false

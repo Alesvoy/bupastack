@@ -1,0 +1,4 @@
+interface:
+  display_name: "Harness Engineering AGENTS.md Retrofit"
+  short_description: "Retrofit AGENTS.md into a short repo map"
+  default_prompt: "Use $harness-engineering-agents-md-retrofit to convert an existing root AGENTS.md into a concise table-of-contents shape and relocate deeper guidance safely."

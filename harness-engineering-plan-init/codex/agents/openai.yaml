@@ -1,0 +1,4 @@
+interface:
+  display_name: "Harness Engineering Plan Init"
+  short_description: "Scaffold progress JSON for an ExecPlan"
+  default_prompt: "Use $harness-engineering-plan-init to scaffold the progress JSON for this ExecPlan."

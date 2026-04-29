@@ -1,0 +1,41 @@
+# AGENTS.md
+
+This file is the canonical agent-facing map for ${PROJECT_NAME}. Keep it short. Put deeper context in the files it points to.
+
+## Start Here
+
+- Read `ARCHITECTURE.md` for the layering contract and dependency rules.
+- Use `docs/exec-plans/active/` for any work that needs durable cross-session state.
+- Use `docs/validation-guide.md` when present to choose validation checks.
+- Use `INBOX.md` as a capture queue only. It is not the execution source of truth.
+
+## Repo Map
+
+- `ARCHITECTURE.md` - architecture rules and layer boundaries
+- `docs/exec-plans/active/` - in-flight ExecPlans
+- `docs/exec-plans/completed/` - completed ExecPlans
+- `docs/design-docs/` - durable design decisions and supporting context
+- `docs/product-specs/` - product-facing intent and behavior
+- `docs/references/` - vendor docs, schemas, and reference material
+- `docs/generated/` - generated artifacts that help agents reason about the system
+- `${APP_ROOT_DISPLAY}` - application code root
+- `INBOX.md` - capture queue / parking lot
+
+## Working Rules
+
+- Prefer domain-first placement over global horizontal buckets.
+- Keep cross-cutting concerns behind explicit providers.
+- Enforce invariants mechanically when possible; do not rely on prose alone.
+- Verify observable behavior before calling work done.
+
+## Commands
+
+- Dev: `<fill me in>`
+- Test: `<fill me in>`
+- Lint: `<fill me in>`
+- Typecheck: `<fill me in>`
+
+## Planning Rule
+
+- Use an ExecPlan for significant refactors, multi-session work, or anything that needs a durable decision and progress trail.
+- Use a brief, issue-like task description for one-session work.
