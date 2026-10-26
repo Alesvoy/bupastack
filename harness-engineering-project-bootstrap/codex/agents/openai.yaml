@@ -1,4 +1,0 @@
-interface:
-  display_name: "Harness Project Bootstrap"
-  short_description: "Scaffold an agent-first project surface"
-  default_prompt: "Use $harness-engineering-project-bootstrap to scaffold AGENTS.md, ARCHITECTURE.md, exec-plan folders, INBOX.md if missing, and a safe domain-first repo shape."

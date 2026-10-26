@@ -1,0 +1,4 @@
+interface:
+  display_name: "Design System"
+  short_description: "Establish design rules from an approved design"
+  default_prompt: "Use $design-system to capture the design system from my chosen design."

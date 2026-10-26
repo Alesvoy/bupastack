@@ -1,0 +1,4 @@
+interface:
+  display_name: "Design Previews"
+  short_description: "Open each local UI design in its own in-app browser tab"
+  default_prompt: "Use $design-previews to open my design alternatives in browser tabs."

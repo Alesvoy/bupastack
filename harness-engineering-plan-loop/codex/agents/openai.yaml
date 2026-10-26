@@ -1,4 +1,0 @@
-interface:
-  display_name: "Harness Engineering Plan Loop"
-  short_description: "Loop an ExecPlan item by item"
-  default_prompt: "Use $harness-engineering-plan-loop to run the initialized ExecPlan item loop with checkpoint and commit after each completed item."

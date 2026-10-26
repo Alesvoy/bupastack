@@ -1,0 +1,4 @@
+interface:
+  display_name: "Build Design"
+  short_description: "Build one UI design from a direction and references"
+  default_prompt: "Use $build-design to build this design from my direction and references."

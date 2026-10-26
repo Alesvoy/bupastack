@@ -1,72 +1,40 @@
-# personal_skills
+# bupastack
 
-Mirror of the harness-engineering skill family in both **Claude Code** and **OpenAI Codex** flavors, so a fresh machine can install them into either CLI without re-porting them.
+My personal agent skills for **Claude Code** and **OpenAI Codex**.
 
 ## Layout
 
-```
-<skill-name>/
-├── claude/      # drop into ~/.claude/skills/<skill-name>/
-└── codex/       # drop into ~/.agents/skills/<skill-name>/
-```
+Each top-level folder installs into one directory:
 
-The two flavors are functionally equivalent. They differ only in the platform-specific substitutions each CLI requires:
-
-| Aspect | Claude Code | Codex |
+| Folder | Installs into | Read by |
 |---|---|---|
-| Slash invocation | `/skill-name` | `$skill-name` |
-| User-scope skills dir | `~/.claude/skills/` | `~/.agents/skills/` |
-| User-scope MCP config | `~/.claude.json` | `~/.codex/config.toml` |
-| Project-scope MCP config | `.mcp.json` | `.codex/config.toml` |
-| Repo instructions file | `CLAUDE.md` (+ `AGENTS.md`) | `AGENTS.md` (+ `AGENTS.override.md`) |
-| MCP CLI | `claude mcp ...` | `codex mcp ...` |
-| Subagent definition | `~/.claude/agents/*.md` (frontmatter + body) | `~/.codex/agents/*.toml` |
+| `shared/` | `~/.agents/skills/` | Codex, and Claude through symlinks in `~/.claude/skills/` |
+| `claude/` | `~/.claude/skills/` | Claude Code |
+| `codex/` | `~/.codex/skills/` | Codex |
 
-## Install on a new machine
+The design skills have a Claude version and a Codex version because each one calls the other tool's features differently.
 
-### Claude Code
+## Install
 
 ```bash
-git clone <this-repo> ~/personal_skills
-for s in ~/personal_skills/*/; do
-  name=$(basename "$s")
-  if [ -d "$s/claude" ] && [ -f "$s/claude/SKILL.md" ]; then
-    mkdir -p ~/.claude/skills/"$name"
-    cp -R "$s/claude/." ~/.claude/skills/"$name"/
-  fi
-done
+git clone git@github.com:Alesvoy/bupastack.git ~/ai/bupastack
+~/ai/bupastack/install.sh
 ```
 
-### Codex
+The script symlinks each skill into place, so edits in the repo take effect immediately. If a skill folder already exists, the script moves it to `~/.skills-backup/<timestamp>/` before linking.
 
-```bash
-git clone <this-repo> ~/personal_skills
-for s in ~/personal_skills/*/; do
-  name=$(basename "$s")
-  if [ -d "$s/codex" ] && [ -f "$s/codex/SKILL.md" ]; then
-    mkdir -p ~/.agents/skills/"$name"
-    cp -R "$s/codex/." ~/.agents/skills/"$name"/
-  fi
-done
-```
+## Skills
 
-## Skill catalog
-
-| Skill | Purpose |
-|---|---|
-| `harness-engineering-project-bootstrap` | Scaffold a greenfield repo with `AGENTS.md`, `ARCHITECTURE.md`, `docs/exec-plans/`, etc. |
-| `harness-engineering-init-claude-md` | (Claude-only) Add a thin `CLAUDE.md` shim that imports `AGENTS.md`. |
-| `harness-engineering-agents-md-retrofit` | Trim a bloated `AGENTS.md`/`CLAUDE.md` into a repo map. |
-| `harness-engineering-mcps-setup` | Recommend repo-needed MCPs and write project config. |
-| `harness-engineering-validation-map` | Generate `docs/validation-guide.md` mapping change types to proof commands. |
-| `harness-engineering-plan` | Turn a raw ask into a Lopopolo-style ExecPlan under `docs/exec-plans/active/`. |
-| `harness-engineering-plan-init` | Scaffold the `<slug>.progress.json` sibling for an ExecPlan. |
-| `harness-engineering-plan-resume` | Start/continue a session: bearings → pick item → orchestrate `implementor` + `validator` (+ `code-reviewer`). |
-| `harness-engineering-plan-checkpoint` | Close a session: verify, flip `done: true`, append to log, suggest commit. |
-| `harness-engineering-plan-loop` | Autonomously loop through remaining ExecPlan items without per-item confirmations. |
-| `harness-engineering-track-task` | Append capture-only entries to a workspace-level `INBOX.md`. |
-| `harness-engineering-failure-retro` | Turn an agent failure into the smallest durable repo improvement. |
-
-## Subagents (not included here)
-
-The harness-engineering flow expects three subagents — `implementor`, `validator`, `code-reviewer`. They live in `~/.claude/agents/*.md` (Claude) and `~/.codex/agents/*.toml` (Codex), not under `skills/`. They are not mirrored in this repo because they have a different install path; manage them separately.
+| Skill | Folder | Purpose |
+|---|---|---|
+| `raise-pr` | shared | Open or update a PR that is safe to merge, after running the repo's checks, QA, and a review. |
+| `review-pr` | shared | Review a PR or branch with parallel reviewers and give a merge verdict. |
+| `merge-pr` | shared | Merge a PR only when the user asks and every check is green. |
+| `cleanup-pr` | shared | Remove worktrees, temp files, and local branches after a merge. |
+| `qa` | shared | Prove a change works with a hands-on test plan run by a QA subagent. |
+| `sign-in-with-1password` | shared | Sign into a website with 1Password autofill through computer use. |
+| `brainstorm-design` | claude, codex | Frame the problem, gather references, and build several design options in parallel. |
+| `build-design` | claude, codex | Build one UI design from a direction and reference images, then review it once. |
+| `design-previews` | claude, codex | Open each design option in its own browser tab and record the user's choice. |
+| `design-system` | claude, codex | Set up or update an app's design system from a chosen design. |
+| `implement-design` | claude, codex | Build a chosen design into the real app. |

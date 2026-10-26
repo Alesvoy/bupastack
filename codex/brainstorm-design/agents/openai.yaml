@@ -1,0 +1,4 @@
+interface:
+  display_name: "Brainstorm Design"
+  short_description: "Explore UI designs, one agent per confirmed direction"
+  default_prompt: "Use $brainstorm-design to build UI alternatives, one per direction I confirm."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Implement Design"
+  short_description: "Integrate the exact design you selected"
+  default_prompt: "Use $implement-design to integrate my chosen design into the app."
