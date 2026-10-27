@@ -86,7 +86,7 @@ Your approval counts in the thread where you type it. In the workflow, that is t
 ### Why the stack looks like this
 
 - **Your skills stay, with sharper jobs.** Recent coordinators depended on `raise-pr`, `review-pr`, `merge-pr`, `cleanup-pr`, and `qa`. The problem was overlap. `raise-pr` ran `review-pr` itself, while hand-written handoff messages ordered it again, so engineers ran reviews twice.
-- **`sol-loop` is the default reviewer for engineers.** Both `sol-loop` and pstack's `thermo-nuclear-review` can run on Sol. `sol-loop` adds a fix loop, severity rules, and a round budget. `thermo-nuclear-review` is a one-pass audit prompt that looks wider, at security, setup breakage, and feature-flag leaks. Step 1 of the plan tests both on past PRs with known defects before the choice is final.
+- **The engineer's review combines two skills.** `sol-loop` supplies the loop: rounds, severity labels, a round budget, and fixes argued with evidence. pstack's `thermo-nuclear-review` supplies the reviewer's prompt, a wider audit for bugs, breaking changes, security, and feature-flag leaks. A test on three past PRs with five known defects decided this. The `thermo-nuclear-review` prompt found two defects with one false alarm. `sol-loop`'s own prompt found none, with two false alarms. Both missed every defect that only shows in the running app, which is why QA drives the app.
 - **Only `grilling` from Matt Pocock.** The rest of his set either waits for you to chain each step, or triggers on its own and competes with skills here. His `code-review`, `pr`, `tdd`, and `prototype` skills would compete with `review-pr`, `raise-pr`, and pstack.
 - **Only `sol-loop` from tstack.** `full-send` runs its own loop through the merge. `full-stop` runs the same loop up to a ready PR. Both would compete with `handoff-to-engineer`. `file-pr`, `babysit-pr`, and `takeover` overlap `raise-pr`, `merge-pr`, and the coordinator. `council` needs three model providers.
 - **Not pstack's Orchestrate or Autopilot playbooks.** Both expect background subagents and a heavier runtime. Your engineers are T3 threads you can open and talk to.
@@ -227,7 +227,7 @@ The engineer works through four steps without you:
 
 1. **Implement.** It reads the ticket and the repo's `AGENTS.md`, then makes the smallest change that meets every acceptance criterion. It adds tests for the new behavior and updates docs in the same commit. It cleans up the diff with `deslop` and `no-comments`, then commits. If the ticket doesn't answer a question, the engineer sends the question to the coordinator. It keeps working on everything that doesn't depend on the answer.
 2. **Verify.** It runs the repo's checks and tests, including any pre-PR gate that `AGENTS.md` defines. It runs the repo's `verify` skill for the features it touched. Then it runs [`qa`](#qa) against the local app. `qa` turns the acceptance criteria into a test plan and hands it to an independent QA agent on Sol. That agent drives the app and captures before and after screenshots. All evidence is saved in a folder named after the commit it tested.
-3. **Review.** It runs [`sol-loop`](#sol-loop). A Sol reviewer checks the diff for bugs and for mismatches with the ticket. The engineer fixes what it agrees with and argues the rest with evidence. The loop runs three rounds by default, or five for security, data loss, or concurrency. If a fix changes behavior, the engineer commits it and reruns the affected checks and QA scenarios, so the evidence matches the final commit.
+3. **Review.** It runs [`sol-loop`](#sol-loop) with `thermo-nuclear-review`'s audit prompt. A Sol reviewer checks the diff for bugs, breaking changes, security problems, and mismatches with the ticket. The engineer fixes what it agrees with and argues the rest with evidence. The loop runs three rounds by default, or five for security, data loss, or concurrency. If a fix changes behavior, the engineer commits it and reruns the affected checks and QA scenarios, so the evidence matches the final commit.
 4. **Open the PR.** It runs [`raise-pr`](#raise-pr). The PR follows the repo's PR rules and has a description you can read in a minute, with the QA results and screenshots. Then the engineer waits for the PR's CI checks and fixes any failure. If the repo has no CI, it records the result of the repo's checks for the final commit.
 
 Then it reports to the coordinator and stops. It never merges, deploys, or starts threads of its own.
@@ -386,7 +386,7 @@ The helper skills work in any thread. Your approval counts in the thread where y
 
 **Engineer steps.** Implement, verify, review, and open the PR, as [step 4 of the walkthrough](#4-the-engineer-delivers-a-pr) describes. Report with `t3_thread_send`, then stop. On findings from the coordinator, fix them, verify again, update the PR, and report again.
 
-**Settings it passes on.** It takes the Sol reviewer's effort from the routing file. The handoff counts as your request to push the ticket's branch.
+**Settings it passes on.** It takes the Sol reviewer's effort from the routing file. It gives the Sol reviewer `thermo-nuclear-review`'s prompt in place of `sol-loop`'s review instructions. The handoff counts as your request to push the ticket's branch.
 
 **Calls.** `t3_thread_launch`, `schedule_task`, `t3_thread_send`, `link_pull_request`, `deslop`, `no-comments`, the repo's `verify` skill, `qa`, `sol-loop`, `raise-pr`, and `review-pr`.
 
@@ -499,7 +499,7 @@ The helper skills work in any thread. Your approval counts in the thread where y
 
 **Rounds.** Three by default. Five for security, data loss, or concurrency. It stops early when a round returns only `nit` findings.
 
-**Use when.** The engineer reviews its change before opening the PR. You can also say "sol loop" in any thread.
+**Use when.** The engineer reviews its change before opening the PR, with `thermo-nuclear-review`'s prompt for the reviewer. You can also say "sol loop" in any thread, which uses `sol-loop`'s own prompt.
 
 ### pstack skills
 
@@ -514,7 +514,7 @@ pstack is published in [cursor/plugins](https://github.com/cursor/plugins). A co
 | `interrogate` | Have several models challenge a contested design. |
 | `deslop`, `no-comments` | Remove AI slop and unneeded comments from the engineer's diff before review. |
 | `thermo-nuclear-code-quality-review` | The rubric for the code-quality reviewer in `review-pr`. |
-| `thermo-nuclear-review` | A deep security and correctness audit of a risky PR. Run it yourself when you want one. |
+| `thermo-nuclear-review` | The audit prompt for the engineer's Sol reviewer inside `sol-loop`. You can also run it yourself on a risky PR. |
 | `create-verification-skill`, `maintain-verification-skill` | Give a repo a `verify` skill that drives its app, and keep that skill accurate. |
 | `recall` | Rebuild context on a stream of work from recent threads. |
 | `bro` | Restate the last answer in plain words. |
