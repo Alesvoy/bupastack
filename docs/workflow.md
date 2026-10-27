@@ -286,7 +286,7 @@ If the verdict is BLOCKED, the coordinator sends the findings to the engineer th
 /merge-pr 42
 ```
 
-[`merge-pr`](#merge-pr) merges the commit you were briefed on, and only after you ask. It also needs a READY verdict for that commit, green checks, an up-to-date branch, and no unresolved review threads. You can approve several briefed PRs in one message, such as "merge 42 and 43". If a PR's head commit changes after your briefing, the coordinator briefs you again and waits.
+[`merge-pr`](#merge-pr) merges the commit you were briefed on, and only after you ask. It also needs a READY verdict for that commit, green checks, an up-to-date branch, and no unresolved review threads. You can approve several briefed PRs in one message, such as "merge 42 and 43". If a PR's head commit changes after your briefing, the coordinator briefs you again and waits. The one exception is a clean merge of the base branch that leaves the PR's own changes identical. Then the coordinator reruns the checks, keeps the verdict, and says so in the merge summary.
 
 Before the merge, `merge-pr` sums it up in three lines. If the repo deploys on merge, the summary names the environment. For a test environment such as dev, your merge request also approves that deploy. For production, `merge-pr` asks you to confirm the production deploy before it merges. After the merge, it runs [`cleanup-pr`](#cleanup-pr), and the coordinator settles the engineer thread. If `cleanup-pr` keeps the worktree because the engineer thread still holds it, run `/cleanup-pr 42` again after the thread is settled.
 
@@ -465,7 +465,7 @@ The helper skills work in any thread. Your approval counts in the thread where y
 **Checks before merging.**
 
 - You asked in this thread, for this PR or for a list of PRs that names it. An approval relayed from another thread never counts.
-- You were briefed on the head commit. If the head changed, it briefs you again and waits.
+- You were briefed on the head commit. If the head changed, it briefs you again and waits, unless only a clean merge of the base changed it and the PR's own changes are identical.
 - The newest verdict comment is READY for that commit. If there isn't one, it runs `review-pr` and asks it to post.
 - The latest run of every CI check is green.
 - The branch is up to date with its base, if the repo requires that.

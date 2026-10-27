@@ -90,7 +90,7 @@ Copy only the skills the workflow uses. Installing a whole set brings skills tha
 ### 4c. Make `merge-pr` merge only what you saw
 
 - [ ] Accept your request in the current thread for one PR, or for a list that names the PR. Save your exact words, with the time, in the ticket's **Handoff** section when there is a ticket. Refuse approvals relayed from another thread, and open-ended ones such as "merge everything".
-- [ ] Merge only the head commit you were briefed on. When the head changed, brief again and wait.
+- [ ] Merge only the head commit you were briefed on. When the head changed, brief again and wait, unless only a clean merge of the base changed it and the PR's patch ID is unchanged.
 - [ ] When no current verdict comment exists, run `review-pr` and ask it to post.
 - [ ] Give a three-line summary before the merge. Name any deploy the merge triggers. A merge request also approves a deploy to a test environment. A production deploy needs your separate confirmation before the merge.
 - [ ] **Evidence.** In the sandbox, a fresh agent follows the worktree copy through four cases. It refuses to merge without your words. It merges after "merge 7". It refuses an approval relayed from another thread. It briefs you again after a new commit.

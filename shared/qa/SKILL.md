@@ -1,60 +1,64 @@
 ---
 name: qa
-description: QA every change by hands-on proof that it works as intended - the app for UI and behavior, real runs for backend, scripts, CI, and skills, and a fresh agent following the instructions for docs and agent rules. Writes a test plan, hands it to a QA subagent, checks its evidence, and reports per scenario. Never N/A. Use for QA, browser checks, validating dev changes, or proving a fix works; not for code review or deployment.
+description: QA any change, including docs and skills, with hands-on proof that it works as intended, locally or on an environment where it's already deployed. Plans expected results from the ticket's acceptance criteria, hands the plan to an independent QA subagent, checks its evidence, and reports per scenario. Never N/A. Use for QA, browser checks, validating changes on dev, or proving a fix works. Not for code review or deployment.
 ---
 
 # QA
 
-Read the repo's `AGENTS.md` (or `CLAUDE.md`) and the docs it links for: how to run the app locally, its UI verification skill or script, hosted or dev access, test accounts, evidence location, and what local proof cannot prove. Repo rules win over this skill. Read `~/.agents/model-routing.md` for which model runs QA and how to delegate.
+Read the repo's `AGENTS.md` (or `CLAUDE.md`) and the docs it links for how to run the app locally, its `verify` skill or script, deployed environments, sign-in, test accounts, and what local proof can't prove. Then read `~/.agents/repos/<repo>.md` when it exists, for this machine's browser profile and port locks. Repo rules win over this skill.
 
-## QA Every Change
+## QA every change
 
-No change skips QA. Prove each changed part works the way it will actually be used:
+No change skips QA. Prove each changed part works the way people will use it:
 
 | Change | Hands-on proof |
 |---|---|
-| UI or behavior | Drive the app (local, or the dev environment). |
-| Backend, API, data | Run the real code path against local services: real inputs, real outputs, before and after. |
+| UI or behavior | Drive the app. |
+| Backend, API, data | Run the real code path against local services, with real inputs and outputs, before and after. |
 | Scripts, checks, validators | Run them on realistic inputs, including one that must fail and one that must pass. |
 | CI workflows | Run each changed job's commands locally. After the push, confirm the workflow triggered and its latest run matches. |
-| Skills and agent tooling | A fresh agent with no context runs the skill or tool on a realistic scenario; report where it went wrong. |
-| Docs and agent rules | A fresh agent follows the changed instructions literally to do what they describe (dry-run anything irreversible), and reports every step that is wrong, ambiguous, or missing. Check links and paths too. |
+| Skills and agent tooling | A fresh agent with no context runs the skill or tool on a realistic case, and reports where it went wrong. |
+| Docs and agent rules | A fresh agent follows the changed instructions literally, dry-running anything irreversible, and reports every wrong, unclear, or missing step. Check links and paths too. |
 | Config and dependencies | Build, start the app, and exercise a path that uses the change. |
 
-A change touching several rows needs each row's proof.
+A change that touches several rows needs each row's proof.
 
-## Choose The Target
+## Choose the target
 
-- **Local** (default): this machine — the app in whatever mode the repo uses for auth-free testing, or the scripts, jobs, and docs being changed.
-- **Dev / hosted**: an already deployed environment. This skill never deploys. If the change is not deployed there, say so and stop, or ask the user to approve a deploy separately.
+- **Local** is the default, for a branch that hasn't merged. Drive the app on this machine in the repo's test mode, with the repo's `verify` skill when there is one. Run changed scripts, jobs, and docs here too.
+- **Deployed** is for an environment the caller names. Confirm that it runs the commit under test. If it doesn't, say so and stop. This skill never deploys.
 
-## Write The Test Plan
+## Write the test plan
 
-From the diff, PR, or requirements, list 3–8 scenarios. For each: the steps, the expected result, and the evidence to capture (screenshot, console, network). Take expected results from the PR description, commit messages, and code, never from a guess; mark any assumption as one. Include:
+List 3 to 8 scenarios, each with steps, the expected result, and the evidence to capture, such as a screenshot, console output, or network log. Take expected results from the ticket's acceptance criteria first, quoting the criterion, then from the PR description, commits, and code. The ticket is the file the caller names, or the one in `~/.agents/tickets/<repo>/` that names the branch. Never guess, and mark any assumption as one. Include:
 
-- The main path of the change, before and after where it changes behavior.
+- The main path of the change, before and after where behavior changes.
 - For a bug fix, the original failing case.
-- One or two edge cases the diff makes likely (empty, long, error, permissions, narrow viewport, dark mode).
-- Whether any step saves data. Default to no saves; name any save the plan allows.
+- One or two edge cases the diff makes likely, such as empty, long, error, permissions, narrow viewport, or dark mode.
+- Whether any step saves data. Default to no saves. On a deployed environment, allow a save only when the user approved it for this run.
+
+## Run once per commit
+
+Each run tests one commit. Save its evidence outside the repo, in `~/verify-evidence/<ticket slug or branch>/<short commit>/`, and never commit it. The slug is the ticket's filename without `.md`. On a later commit, rerun each scenario that failed, was blocked, or exercises a file in `git diff --name-only <the commit it ran on>..<commit>`. Carry the rest forward with the commit they ran on, their evidence path, and why the diff can't change them. When unsure, rerun. If every scenario carries forward, skip the subagent. Evidence covers a commit when every scenario ran on it or was carried forward to it.
 
 ## Delegate
 
-Hand the plan to the QA role from the routing file, with one QA subagent per target. For docs, rules, and skills, the subagent must start without your context, so its confusion is real evidence. The task must stand alone, because the child sees no conversation history:
+Hand the plan to a QA subagent on the "QA, local and deployed" row of `~/.agents/model-routing.md`, one per target. In T3 Code, use `delegate_task` so it runs on the routed model and effort. Elsewhere, use your runtime's subagent tool and say that routing fell back. Share the parent checkout so it sees the running app and current changes. It sees no conversation history, so the task must stand alone. For docs, rules, and skills, leave out your own context, so its confusion is real evidence. Include:
 
-- The goal, the repo path, the branch and commit under test, and the URL or the command to start the app.
+- The goal, the repo path, the branch and full commit under test, and the URL or the command that starts the app.
 - The runtime the repo pins (`.nvmrc`, `engines`), with the exact `PATH` or version-manager command that selects it on this machine.
-- The repo skill or script to use for driving the UI and for sign-in, by name.
-- The full test plan.
-- Limits: no code edits, commits, pushes, deploys, or data changes beyond what the plan allows. Do not reveal credentials.
+- The repo skill or script for driving the UI and for sign-in, by name. Without a repo sign-in skill, use [sign-in-with-1password](../sign-in-with-1password/SKILL.md).
+- The full test plan, and the evidence folder.
+- Limits: no code edits, commits, pushes, deploys, or data changes beyond what the plan allows. Reveal no credentials.
 - Cleanup: stop any dev server or browser session it started, and report anything left running.
-- Report format: per scenario `pass | fail | blocked | plan mismatch` (the app works but differs from the plan's expectation), what was observed, and the evidence file path in the repo's evidence location, outside tracked files. For each defect: steps to reproduce, expected and actual results, and evidence.
+- The report format: per scenario `pass`, `fail`, `blocked`, or `plan mismatch` (the app works but differs from the plan), what it saw, and the evidence file path. For each defect, the steps to reproduce, the expected and actual results, and the evidence.
 
-Share the parent checkout so the child sees the running app and current changes. If sign-in needs the user (MFA, vault unlock, phone approval), relay the child's question to the user instead of guessing.
+When sign-in needs the user, such as for MFA, a vault unlock, or a phone approval, relay the subagent's question to the user and wait.
 
-## Check The Evidence
+## Check the evidence
 
-Do not relay a pass you have not checked. Open the cited screenshots or logs and confirm they show the claimed result for the right build. Re-run or re-delegate scenarios whose evidence is missing or unconvincing. Before reporting a fail as a defect, check the intended behavior in the PR, commits, and code; a fail caused by a wrong expectation is a plan error, not a defect. Confirm a reported defect also fails on the base branch before calling it pre-existing.
+Don't relay a pass you haven't checked. Open the cited screenshots or logs and confirm they show the claimed result for the commit under test. Re-run or re-delegate scenarios whose evidence is missing or unconvincing. Before you report a fail as a defect, check the intended behavior in the ticket, PR, commits, and code. A fail caused by a wrong expectation is a plan error, not a defect. Confirm that a defect also fails on the base branch before you call it pre-existing.
 
 ## Report
 
-A table of scenarios with result and evidence path, then defects ordered by impact, then what was not covered. Label local mock-mode proof as UI-only and anything not exercised against the real backend as unverified, using the repo's wording. Name the model that ran QA and whether routing fell back. Keep evidence out of tracked files.
+Write the report in the thread and as `report.md` in the commit's evidence folder, where [raise-pr](../raise-pr/SKILL.md) reads it and the screenshots it cites. Start with the full commit tested and the target. Then give a table of scenarios with the result, the commit each ran on, and the evidence path. Then list defects ordered by impact, then what wasn't covered. Label local mock-mode proof as UI-only, and anything not run against the real backend as unverified, in the repo's wording. Name the model that ran QA, and say whether routing fell back.
