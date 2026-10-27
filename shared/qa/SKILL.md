@@ -59,7 +59,7 @@ When sign-in needs the user, such as for MFA, a vault unlock, or a phone approva
 
 ## Check the evidence
 
-Don't relay a pass you haven't checked. Open the cited screenshots or logs and confirm they show the claimed result for the commit under test. Re-run or re-delegate scenarios whose evidence is missing or unconvincing. Before you report a fail as a defect, check the intended behavior in the ticket, PR, commits, and code. A fail caused by a wrong expectation is a plan error, not a defect. Confirm that a defect also fails on the base branch before you call it pre-existing.
+Before you report, run `lsof +D <worktree>`. Stop each process the QA run started that still holds the worktree, such as a dev server or a browser, so cleanup-pr can remove the worktree later. Don't relay a pass you haven't checked. Open the cited screenshots or logs and confirm they show the claimed result for the commit under test. Re-run or re-delegate scenarios whose evidence is missing or unconvincing. Before you report a fail as a defect, check the intended behavior in the ticket, PR, commits, and code. A fail caused by a wrong expectation is a plan error, not a defect. Confirm that a defect also fails on the base branch before you call it pre-existing.
 
 ## Report
 

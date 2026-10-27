@@ -118,16 +118,16 @@ Copy only the skills the workflow uses. Installing a whole set brings skills tha
   - [x] **Codex note.** When the T3 tools aren't listed, call one of them directly before treating them as missing.
   - [x] **Never.** Merge, deploy, force-push, or change anything outside the ticket's scope.
 - [x] Write `references/ticket-template.md` and `references/report-format.md` from the formats in `workflow.md`.
-- [ ] Follow pstack's skill-authoring playbook. The frontmatter has `name` and `description`, every link resolves, and prose that doesn't change a decision is cut.
+- [x] Follow pstack's skill-authoring playbook. The frontmatter has `name` and `description`, every link resolves, and prose that doesn't change a decision is cut.
 - [ ] **Evidence.** In the sandbox, a coordinator follows the worktree copy, and the engineer's first message points at the same path. Every one of these holds:
-  - [ ] A ticket with an open question is refused.
-  - [ ] A ready ticket launches an engineer thread in a new worktree.
-  - [ ] The engineer's transcript has no `t3_thread_launch` call.
-  - [ ] The PR opens with QA evidence and screenshots, after one QA run and one review loop per head commit.
-  - [ ] The report arrives in the coordinator thread, and the check-in turns itself off.
+  - [x] A ticket with an open question is refused.
+  - [x] A ready ticket launches an engineer thread in a new worktree.
+  - [x] The engineer's transcript has no `t3_thread_launch` call.
+  - [x] The PR opens with QA evidence and screenshots, after one QA run and one review loop per head commit.
+  - [x] The report arrives in the coordinator thread, and the check-in turns itself off.
   - [ ] `review-pr` briefs you and posts the verdict without being asked.
-  - [ ] A planted BLOCKED finding goes back to the engineer, and the PR is fixed and reviewed again.
-  - [ ] After you merge, `cleanup-pr` removes the engineer's worktree, or reports why it kept it.
+  - [x] A planted BLOCKED finding goes back to the engineer, and the PR is fixed and reviewed again.
+  - [x] After you merge, `cleanup-pr` removes the engineer's worktree, or reports why it kept it.
 
 ## Step 6. Prepare each client repo
 
