@@ -21,12 +21,12 @@ Work through the steps in order. Each step ends with **Evidence** boxes. Check a
 
 ## Step 0. Set up the branch and the sandbox
 
-- [ ] Create the worktree with `git -C ~/ai/bupastack worktree add ~/ai/bupastack-skill-stack -b skill-stack main`.
-- [ ] Move `~/ai/bupastack/docs/` into the worktree, and commit it there when you ask.
-- [ ] Run `gh api user -q .login` to see which GitHub account is active. Use your personal account for the sandbox, passed per command with `GH_TOKEN="$(gh auth token -u <personal-account>)"`.
-- [ ] Create a private sandbox repo under your personal account. Give it a small web app, an `AGENTS.md` with its check command and PR rules, a `verify` skill, and a T3 project.
-- [ ] List the work in flight. Run `t3_thread_list` with statuses `running` and `waiting` for each client project, and `list_scheduled_tasks` for each project. Save both lists in `~/.agents/repos/readiness.md`.
-- [ ] **Evidence.** `git -C ~/ai/bupastack status --short` prints nothing. `gh repo view <sandbox> --json visibility` says `PRIVATE`. The sandbox appears in `t3_project_list`. Both lists are saved.
+- [x] Create the worktree with `git -C ~/ai/bupastack worktree add ~/ai/bupastack-skill-stack -b skill-stack main`.
+- [x] Move `~/ai/bupastack/docs/` into the worktree, and commit it there when you ask.
+- [x] Run `gh api user -q .login` to see which GitHub account is active. Use your personal account for the sandbox, passed per command with `GH_TOKEN="$(gh auth token -u <personal-account>)"`.
+- [x] Create a private sandbox repo under your personal account. Give it a small web app, an `AGENTS.md` with its check command and PR rules, a `verify` skill, and a T3 project.
+- [x] List the work in flight. Run `t3_thread_list` with statuses `running` and `waiting` for each client project, and `list_scheduled_tasks` for each project. Save both lists in `~/.agents/repos/readiness.md`.
+- [x] **Evidence.** `git -C ~/ai/bupastack status --short` prints nothing. `gh repo view <sandbox> --json visibility` says `PRIVATE`. The sandbox appears in `t3_project_list`. Both lists are saved.
 
 ## Step 1. Decide the open questions by experiment
 
@@ -34,12 +34,12 @@ Work through the steps in order. Each step ends with **Evidence** boxes. Check a
 
 The workflow defaults to `sol-loop`. Test it against `thermo-nuclear-review` before building on it.
 
-- [ ] Pick three merged PRs whose first review found real defects. Record each PR's pre-fix head commit and its known defects in `~/.agents/repos/readiness.md`.
-- [ ] On each pre-fix head, run two reviewers with T3 `delegate_task`, both on `gpt-6.1-sol` at `xhigh`. One gets `sol-loop`'s round-1 review prompt. The other gets `thermo-nuclear-review`'s prompt. Neither may edit code.
-- [ ] Score each run on known defects found, false positives, and minutes taken.
-- [ ] Keep `sol-loop` unless `thermo-nuclear-review` finds more known defects without more false positives.
-- [ ] If `thermo-nuclear-review` wins, change the review step everywhere it appears: both docs, and the engineer steps in step 5. Keep `sol-loop`'s fix loop, severity rules, and round budget, and use `thermo-nuclear-review`'s prompt for the reviewer.
-- [ ] **Evidence.** The score table is in `~/.agents/repos/readiness.md`. The `sol-loop` entry in `workflow.md` states the outcome, without client details.
+- [x] Pick three merged PRs whose first review found real defects. Record each PR's pre-fix head commit and its known defects in `~/.agents/repos/readiness.md`.
+- [x] On each pre-fix head, run two reviewers with T3 `delegate_task`, both on `gpt-6.1-sol` at `xhigh`. One gets `sol-loop`'s round-1 review prompt. The other gets `thermo-nuclear-review`'s prompt. Neither may edit code.
+- [x] Score each run on known defects found, false positives, and minutes taken.
+- [x] Keep `sol-loop` unless `thermo-nuclear-review` finds more known defects without more false positives.
+- [x] If `thermo-nuclear-review` wins, change the review step everywhere it appears: both docs, and the engineer steps in step 5. Keep `sol-loop`'s fix loop, severity rules, and round budget, and use `thermo-nuclear-review`'s prompt for the reviewer.
+- [x] **Evidence.** The score table is in `~/.agents/repos/readiness.md`. The `sol-loop` entry in `workflow.md` states the outcome, without client details.
 
 ### 1b. Choose how screenshots reach a PR
 
@@ -52,9 +52,9 @@ Some client repos require screenshots attached to the PR, and agents had no way 
 
 ## Step 2. Choose what to retire
 
-- [ ] On the branch, delete `harness-engineering-project-bootstrap/` and `harness-engineering-track-task/` with `git rm -r`. Both hold only compiled Python caches from retired skills.
+- [x] On the branch, delete `harness-engineering-project-bootstrap/` and `harness-engineering-track-task/` with `git rm -r`. Both hold only compiled Python caches from retired skills.
 - [ ] List every skill in `~/.agents/skills`, `~/.claude/skills`, and `~/.codex/skills` that the [skill table](workflow.md#find-a-skill-by-job) doesn't name. Save the list in `~/.agents/repos/readiness.md`, and mark each one keep or remove. Step 7 removes the marked ones.
-- [ ] Delete the global memory note that tells agents to use the retired harness-engineering skills, and its line in the memory index, in `~/.claude/projects/<home>/memory/`. It points at skills that no longer exist, so deleting it now is safe.
+- [x] Delete the global memory note that tells agents to use the retired harness-engineering skills, and its line in the memory index, in `~/.claude/projects/<home>/memory/`. It points at skills that no longer exist, so deleting it now is safe.
 - [ ] Decide the global memory note that tells agents to use GitHub MCP tools instead of `gh`. Every PR skill uses `gh`, so the note conflicts with them.
 - [ ] **Evidence.** `git ls-files | grep harness` prints nothing on the branch. `grep -ri harness-engineering` in the memory folder prints nothing. The skill list has a mark on every line.
 
@@ -62,45 +62,45 @@ Some client repos require screenshots attached to the PR, and agents had no way 
 
 Copy only the skills the workflow uses. Installing a whole set brings skills that trigger on their own and compete with yours.
 
-- [ ] Create `vendor/grilling/` and `vendor/grill-me/` from `mattpocock/skills` at commit `5beb35b`, and `vendor/sol-loop/` from `t3dotgg/tstack` at commit `7de017b`. Give each folder a `SOURCE.md` with the upstream URL and the commit.
-- [ ] Make `install.sh` link `vendor/*` into `~/.agents/skills/`, and add the matching links in `~/.claude/skills/`, the same way it handles `shared/*`.
-- [ ] Add `vendor/` and its skills to the README's layout and skill tables.
-- [ ] **Evidence.** In the worktree, `HOME=$(mktemp -d) sh install.sh` creates links for `grilling`, `grill-me`, and `sol-loop` in both `.agents/skills` and `.claude/skills` under the temporary home.
+- [x] Create `vendor/grilling/` and `vendor/grill-me/` from `mattpocock/skills` at commit `5beb35b`, and `vendor/sol-loop/` from `t3dotgg/tstack` at commit `7de017b`. Give each folder a `SOURCE.md` with the upstream URL and the commit.
+- [x] Make `install.sh` link `vendor/*` into `~/.agents/skills/`, and add the matching links in `~/.claude/skills/`, the same way it handles `shared/*`.
+- [x] Add `vendor/` and its skills to the README's layout and skill tables.
+- [x] **Evidence.** In the worktree, `HOME=$(mktemp -d) sh install.sh` creates links for `grilling`, `grill-me`, and `sol-loop` in both `.agents/skills` and `.claude/skills` under the temporary home.
 
 ## Step 4. Change your skills on the branch
 
 ### 4a. Make `review-pr` brief you and own the verdict
 
-- [ ] Put the briefing first in the output. It says what the PR does for users, why, how it was proven with screenshots, what could break, and what to look at yourself.
-- [ ] Replace the three reviewers with the four in [workflow.md](workflow.md#review-pr), which are ticket and evidence, repo rules, code quality, and correctness. The code-quality reviewer uses `thermo-nuclear-code-quality-review`'s rubric, and it blocks only on a real defect. The correctness reviewer is skipped when `sol-loop` approved the same head commit, and the report says so.
-- [ ] Base READY on passing CI. When the repo has no CI, base it on the engineer's recorded result of the repo's checks for that commit.
-- [ ] Post the verdict comment only when the caller asks for it. Name no models in the comment where repo rules forbid mentioning AI.
-- [ ] Delete pre-PR mode. `sol-loop` reviews the change before a PR exists.
+- [x] Put the briefing first in the output. It says what the PR does for users, why, how it was proven with screenshots, what could break, and what to look at yourself.
+- [x] Replace the three reviewers with the four in [workflow.md](workflow.md#review-pr), which are ticket and evidence, repo rules, code quality, and correctness. The code-quality reviewer uses `thermo-nuclear-code-quality-review`'s rubric, and it blocks only on a real defect. The correctness reviewer is skipped when `sol-loop` approved the same head commit, and the report says so.
+- [x] Base READY on passing CI. When the repo has no CI, base it on the engineer's recorded result of the repo's checks for that commit.
+- [x] Post the verdict comment only when the caller asks for it. Name no models in the comment where repo rules forbid mentioning AI.
+- [x] Delete pre-PR mode. `sol-loop` reviews the change before a PR exists.
 - [ ] **Evidence.** A fresh agent follows the worktree copy on a sandbox PR. Its output runs briefing, then findings, then verdict. It posts the comment only when told to.
 
 ### 4b. Make `raise-pr` only open the PR
 
-- [ ] Delete the sections that run the pre-PR gate, `qa`, and `review-pr`, and the section that posts the verdict.
-- [ ] Add the ready-or-draft rule. Open ready when the evidence covers the head commit and shows no failures. Otherwise open a draft and list what's missing under **Not verified**.
-- [ ] Add the [PR description format](workflow.md#pr-description-format), with the QA table and the screenshot method from 1b.
-- [ ] Take the GitHub account from `~/.agents/repos/<repo>.md`, or from the repo's docs when that file doesn't exist. Keep the duplicate-PR check. Add `link_pull_request`.
-- [ ] Rewrite the frontmatter description so it no longer promises QA, review, or a verdict.
-- [ ] **Evidence.** A fresh agent follows the worktree copy on a sandbox branch twice, once with passing evidence and once with none. The first PR opens ready with screenshots. The second opens as a draft and lists what's missing.
+- [x] Delete the sections that run the pre-PR gate, `qa`, and `review-pr`, and the section that posts the verdict.
+- [x] Add the ready-or-draft rule. Open ready when the evidence covers the head commit and shows no failures. Otherwise open a draft and list what's missing under **Not verified**.
+- [x] Add the [PR description format](workflow.md#pr-description-format), with the QA table and the screenshot method from 1b.
+- [x] Take the GitHub account from `~/.agents/repos/<repo>.md`, or from the repo's docs when that file doesn't exist. Keep the duplicate-PR check. Add `link_pull_request`.
+- [x] Rewrite the frontmatter description so it no longer promises QA, review, or a verdict.
+- [x] **Evidence.** A fresh agent follows the worktree copy on a sandbox branch twice, once with passing evidence and once with none. The first PR opens ready with screenshots. The second opens as a draft and lists what's missing.
 
 ### 4c. Make `merge-pr` merge only what you saw
 
-- [ ] Accept your request in the current thread for one PR, or for a list that names the PR. Save your exact words, with the time, in the ticket's **Handoff** section when there is a ticket. Refuse approvals relayed from another thread, and open-ended ones such as "merge everything".
-- [ ] Merge only the head commit you were briefed on. When the head changed, brief again and wait, unless only a clean merge of the base changed it and the PR's patch ID is unchanged.
-- [ ] When no current verdict comment exists, run `review-pr` and ask it to post.
-- [ ] Give a three-line summary before the merge. Name any deploy the merge triggers. A merge request also approves a deploy to a test environment. A production deploy needs your separate confirmation before the merge.
+- [x] Accept your request in the current thread for one PR, or for a list that names the PR. Save your exact words, with the time, in the ticket's **Handoff** section when there is a ticket. Refuse approvals relayed from another thread, and open-ended ones such as "merge everything".
+- [x] Merge only the head commit you were briefed on. When the head changed, brief again and wait, unless only a clean merge of the base changed it and the PR's patch ID is unchanged.
+- [x] When no current verdict comment exists, run `review-pr` and ask it to post.
+- [x] Give a three-line summary before the merge. Name any deploy the merge triggers. A merge request also approves a deploy to a test environment. A production deploy needs your separate confirmation before the merge.
 - [ ] **Evidence.** In the sandbox, a fresh agent follows the worktree copy through four cases. It refuses to merge without your words. It merges after "merge 7". It refuses an approval relayed from another thread. It briefs you again after a new commit.
 
 ### 4d. Make `qa` plan from the ticket
 
-- [ ] Take expected results from the ticket's acceptance criteria first, then from the PR description, commits, and code.
-- [ ] State when to use the local target and when to use the deployed target. Keep "never deploys".
-- [ ] Name each evidence folder after the commit it tested, and record that commit in the report. Save screenshots where `raise-pr` reads them.
-- [ ] **Evidence.** A fresh agent follows the worktree copy with a sample ticket. The test plan's expected results quote the acceptance criteria, and the evidence folder carries the commit.
+- [x] Take expected results from the ticket's acceptance criteria first, then from the PR description, commits, and code.
+- [x] State when to use the local target and when to use the deployed target. Keep "never deploys".
+- [x] Name each evidence folder after the commit it tested, and record that commit in the report. Save screenshots where `raise-pr` reads them.
+- [x] **Evidence.** A fresh agent follows the worktree copy with a sample ticket. The test plan's expected results quote the acceptance criteria, and the evidence folder carries the commit.
 
 ### 4e. Check `cleanup-pr` in the dry run
 
@@ -108,16 +108,16 @@ Copy only the skills the workflow uses. Installing a whole set brings skills tha
 
 ## Step 5. Create `handoff-to-engineer` on the branch
 
-- [ ] Write `shared/handoff-to-engineer/SKILL.md`. Its parts, in order:
-  - [ ] **Role routing.** A thread whose first message says "You are the engineer" follows the engineer steps and never calls `t3_thread_launch`.
-  - [ ] **Coordinator steps.** Write the ticket from the template if none exists, creating `~/.agents/tickets/<repo>/` when needed. Check the ticket, pick the model, launch with `t3_thread_launch` in a worktree, schedule the check-in, and record the handoff. When the report arrives, run `review-pr` and ask it to post.
-  - [ ] **Rework.** When the verdict is BLOCKED, send the findings to the engineer thread with `t3_thread_send`, then review again after the engineer reports.
-  - [ ] **Engineer steps.** Implement, clean up with `deslop` and `no-comments`, and commit. Verify with the repo's checks and tests, the `verify` skill, and `qa`. Review with `sol-loop` and `thermo-nuclear-review`'s prompt, commit any fix, and rerun the affected checks and QA. Open the PR with `raise-pr`. Wait for CI and fix failures, or record the repo's checks when the repo has no CI. Report with `t3_thread_send`, then stop.
-  - [ ] **Check-in step.** Read the engineer thread. Stay quiet while it runs. Post one line when it stops without a report, waits on a question, or fails. Turn the check-in off once the report arrives.
-  - [ ] **Settings.** Take the Sol reviewer's effort from `~/.agents/model-routing.md`. The handoff counts as your request to push the ticket's branch.
-  - [ ] **Codex note.** When the T3 tools aren't listed, call one of them directly before treating them as missing.
-  - [ ] **Never.** Merge, deploy, force-push, or change anything outside the ticket's scope.
-- [ ] Write `references/ticket-template.md` and `references/report-format.md` from the formats in `workflow.md`.
+- [x] Write `shared/handoff-to-engineer/SKILL.md`. Its parts, in order:
+  - [x] **Role routing.** A thread whose first message says "You are the engineer" follows the engineer steps and never calls `t3_thread_launch`.
+  - [x] **Coordinator steps.** Write the ticket from the template if none exists, creating `~/.agents/tickets/<repo>/` when needed. Check the ticket, pick the model, launch with `t3_thread_launch` in a worktree, schedule the check-in, and record the handoff. When the report arrives, run `review-pr` and ask it to post.
+  - [x] **Rework.** When the verdict is BLOCKED, send the findings to the engineer thread with `t3_thread_send`, then review again after the engineer reports.
+  - [x] **Engineer steps.** Implement, clean up with `deslop` and `no-comments`, and commit. Verify with the repo's checks and tests, the `verify` skill, and `qa`. Review with `sol-loop` and `thermo-nuclear-review`'s prompt, commit any fix, and rerun the affected checks and QA. Open the PR with `raise-pr`. Wait for CI and fix failures, or record the repo's checks when the repo has no CI. Report with `t3_thread_send`, then stop.
+  - [x] **Check-in step.** Read the engineer thread. Stay quiet while it runs. Post one line when it stops without a report, waits on a question, or fails. Turn the check-in off once the report arrives.
+  - [x] **Settings.** Take the Sol reviewer's effort from `~/.agents/model-routing.md`. The handoff counts as your request to push the ticket's branch.
+  - [x] **Codex note.** When the T3 tools aren't listed, call one of them directly before treating them as missing.
+  - [x] **Never.** Merge, deploy, force-push, or change anything outside the ticket's scope.
+- [x] Write `references/ticket-template.md` and `references/report-format.md` from the formats in `workflow.md`.
 - [ ] Follow pstack's skill-authoring playbook. The frontmatter has `name` and `description`, every link resolves, and prose that doesn't change a decision is cut.
 - [ ] **Evidence.** In the sandbox, a coordinator follows the worktree copy, and the engineer's first message points at the same path. Every one of these holds:
   - [ ] A ticket with an open question is refused.
