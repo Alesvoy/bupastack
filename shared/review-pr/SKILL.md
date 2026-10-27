@@ -28,7 +28,7 @@ Reading needs no worktree. To run builds or tests at the head, say so, then crea
 
 ## Run four reviewers in parallel
 
-Start them in one turn, each on the row of `~/.agents/model-routing.md` named in parentheses below. In T3 Code, use `delegate_task` so each runs on its routed model and effort. Elsewhere, use your runtime's subagent tool and say that routing fell back. Reviewers are read-only and see no conversation history. Give each the PR URL, the base and head SHAs, the diff or how to read it, the review worktree path, the repo's rule docs, and the existing threads.
+Start them in one turn, each on the row of `~/.agents/model-routing.md` named in parentheses below. In T3 Code, use `delegate_task` so each runs on its routed model and effort. Elsewhere, use your runtime's subagent tool and say that routing fell back. Reviewers are read-only and see no conversation history. Tell each: "You are one reviewer. Don't load the review-pr skill, and don't start subagents." Give each the GitHub account with the `GH_TOKEN` prefix for every `gh` call, the PR URL, the base and head SHAs, the diff or how to read it, the review worktree path, the repo's rule docs, and the existing threads.
 
 1. **Ticket and evidence** (`review-pr` ticket and repo-rules reviewers). Does the PR do what its ticket asks, or what its description says when there is no ticket? Is the QA evidence real, and does it cover the head commit and every changed part? Check each carried-forward scenario's reason against the diff since its commit. Give it the ticket, the engineer's report, and the evidence folder.
 2. **Repo rules** (`review-pr` ticket and repo-rules reviewers). Check the diff against every rule in the repo's review, PR, and commit docs. Cite the rule each finding breaks.
@@ -50,6 +50,26 @@ When the head moved only by a merge of the base without conflicts, compare the P
 ## Report the briefing, then the findings, then the verdict
 
 Re-read the remote base and head first. If either moved, review the new commits before you report. Remove the review worktree when done.
+
+Wait for every reviewer, then send one reply. Start it with the briefing. Never start with the verdict, a recommendation, or a reviewer's results, and send no update per reviewer. Use this shape:
+
+```
+PR <number>: <title>
+
+What it does: <for its users, old behavior then new>
+Why: <one sentence>
+How it was proven: <QA result and the main before and after screenshots>
+What could break: <risk, and what QA checked>
+Worth a look: <where the user should look, and why>
+Decisions for you: <each departure or disputed finding, with your recommendation, or "none">
+
+Findings:
+- Blocking: <each, or "none">
+- Optional: <each, or "none">
+- Reviewers: <each reviewer and its model, plus any skipped or fallback, with the reason>
+
+Verdict: <READY or BLOCKED> for <full head sha>. <the reasons when BLOCKED>
+```
 
 1. **Briefing.** In plain words, say what the PR does for its users and why, and how it was proven, with the main before and after screenshots. Say what could break and what the user should look at themselves. On a re-review, say what changed since the last briefing.
 2. **Findings.** Blocking findings first, ordered by impact, then optional ones. Skip what the linter covers. Name each reviewer's model, and any reviewer that was skipped or fell back to another model, with the reason.

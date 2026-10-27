@@ -45,7 +45,9 @@ Each run tests one commit. Save its evidence outside the repo, in `~/verify-evid
 
 Hand the plan to a QA subagent on the "QA, local and deployed" row of `~/.agents/model-routing.md`, one per target. In T3 Code, use `delegate_task` so it runs on the routed model and effort. Elsewhere, use your runtime's subagent tool and say that routing fell back. Share the parent checkout so it sees the running app and current changes. It sees no conversation history, so the task must stand alone. For docs, rules, and skills, leave out your own context, so its confusion is real evidence. Include:
 
+- Its role, in these words: "You are the QA runner. Run this plan and report. Don't load the qa skill, and don't delegate."
 - The goal, the repo path, the branch and full commit under test, and the URL or the command that starts the app.
+- The GitHub account from the operator notes, when a step touches GitHub, with the `GH_TOKEN="$(gh auth token -u <account>)"` prefix for every `gh` call.
 - The runtime the repo pins (`.nvmrc`, `engines`), with the exact `PATH` or version-manager command that selects it on this machine.
 - The repo skill or script for driving the UI and for sign-in, by name. Without a repo sign-in skill, use [sign-in-with-1password](../sign-in-with-1password/SKILL.md).
 - The full test plan, and the evidence folder.

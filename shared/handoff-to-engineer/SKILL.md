@@ -35,7 +35,7 @@ If this thread's first message says "You are the engineer", follow the [engineer
 While the engineer works, handle what arrives:
 
 - **A question.** Answer it from the ticket, or ask the user and pass their answer on with `t3_thread_send`. Add each answer to the ticket.
-- **The report.** Turn off the check-in with `delete_scheduled_task`. For a ready report, run [review-pr](../review-pr/SKILL.md) on its PR, and ask it to post the verdict. For a blocked report, go to [Rework](#rework).
+- **The report.** Turn off the check-in with `delete_scheduled_task`. For every ready report, the first one and each one after rework, run [review-pr](../review-pr/SKILL.md) on its PR, and ask it to post the verdict. Do this even when the report's Departures or a disputed review finding need the user's decision. The briefing's "Decisions for you" line puts each decision to the user, with your recommendation. For a blocked report, go to [Rework](#rework).
 - **The user's request to stop the engineer.** Interrupt its thread with `t3_thread_interrupt`, and turn off its check-in.
 - **The merge.** After merge-pr merges the PR, settle the engineer thread with `t3_thread_organize` and `action: "settle"`. If cleanup-pr kept the engineer's worktree because the thread still held it, run cleanup-pr again.
 
@@ -76,7 +76,7 @@ The scheduled check-in runs this step in the coordinator thread. Read the engine
 ## Settings
 
 - The engineer runs `sol-loop`'s Sol reviewer at the effort in the "Engineer's review with `sol-loop`" row of `~/.agents/model-routing.md`.
-- In the Sol reviewer's brief, replace `sol-loop`'s review instructions (from "Read surrounding code" to the severity line) with the prompt of pstack's `thermo-nuclear-review` skill, without its "Final Response" section. Keep `sol-loop`'s header lines, severity labels, reply format, round budget, and ledger. A test on past PRs with known defects found more of them with this prompt.
+- In the Sol reviewer's brief, replace `sol-loop`'s review instructions (from "Read surrounding code" to the severity line) with the prompt of pstack's `thermo-nuclear-review` skill, without its "Final Response" section. Keep `sol-loop`'s header lines, severity labels, reply format, round budget, and ledger. Tell the reviewer not to load the review-pr or qa skills, and to write any scratch files under `/tmp`, never in an evidence folder. A test on past PRs with known defects found more of them with this prompt.
 - The handoff counts as the user's request to push the ticket's branch and update its PR.
 
 ## Codex note
