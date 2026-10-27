@@ -5,7 +5,7 @@ description: Merge a pull request only when the user asks in the current thread,
 
 # Merge PR
 
-Read the repo's `AGENTS.md` (or `CLAUDE.md`) Merge Contract for the base branch, merge method, required and advisory checks, the up-to-date rule, the verdict format, and what a merge triggers, such as an automatic deploy. Repo rules win over this skill. Use the GitHub account for each command as [raise-pr](../raise-pr/SKILL.md) describes.
+Read the repo's `AGENTS.md` (or `CLAUDE.md`) Merge Contract for the base branch, merge method, required and advisory checks, the up-to-date rule, the verdict format, and what a merge triggers, such as an automatic deploy. Then read `~/.agents/repos/<repo>.md` when it exists. Repo rules win over this skill. Take the GitHub account from `~/.agents/repos/<repo>.md`, or from the repo's docs when that file doesn't exist. Prefix every `gh` call with `GH_TOKEN="$(gh auth token -u <account>)"`, as the commands below show, even when another account is active. Never run `gh auth switch`, and never print a token.
 
 ## Confirm the request
 
@@ -16,9 +16,9 @@ When a ticket in `~/.agents/tickets/<repo>/` names the PR's branch, add the user
 ## Confirm readiness
 
 ```sh
-gh pr view <number> -R <owner>/<repo> --json url,state,isDraft,baseRefName,headRefName,headRefOid,mergeable,mergeStateStatus,reviewDecision
-gh pr checks <number> -R <owner>/<repo>
-gh api repos/<owner>/<repo>/issues/<number>/comments --paginate
+GH_TOKEN="$(gh auth token -u <account>)" gh pr view <number> -R <owner>/<repo> --json url,state,isDraft,baseRefName,headRefName,headRefOid,mergeable,mergeStateStatus,reviewDecision
+GH_TOKEN="$(gh auth token -u <account>)" gh pr checks <number> -R <owner>/<repo>
+GH_TOKEN="$(gh auth token -u <account>)" gh api repos/<owner>/<repo>/issues/<number>/comments --paginate
 ```
 
 Every item must hold. If one fails, fix what you're allowed to fix, or stop and report what blocks:
@@ -35,7 +35,7 @@ Every item must hold. If one fails, fix what you're allowed to fix, or stop and 
 Sum up the merge in three lines: the PR and its head commit, the verdict and checks, and what the merge triggers. The merge request also approves a deploy to a test environment. When the merge deploys to production, ask the user to confirm that deploy, and wait.
 
 ```sh
-gh pr merge <number> -R <owner>/<repo> --<squash|merge|rebase> --match-head-commit <briefed head sha>
+GH_TOKEN="$(gh auth token -u <account>)" gh pr merge <number> -R <owner>/<repo> --<squash|merge|rebase> --match-head-commit <briefed head sha>
 ```
 
 Use the contract's merge method. If GitHub refuses because the head moved, go back to item 2. Never use `--admin`, bypass protections, enable auto-merge, or delete the remote branch unless the contract says to. If the result is unclear, read the PR state before you retry.
