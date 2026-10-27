@@ -30,7 +30,7 @@ Where the repo's rules forbid mentioning AI, name no model or AI tool in commits
 
 Find the evidence for the head commit: the repo's check results from this thread, and the QA report in the folder that [qa](../qa/SKILL.md) names after the commit. Find it with `find ~/verify-evidence -type d -name <short head sha>`. Don't run checks, QA, or reviews here.
 
-Open the PR ready for review only when the evidence covers the head commit, as qa defines, and shows no failures. Otherwise open it as a draft and list what's missing under **Not verified**. Apply the same rule when you update a PR, with `gh pr ready` or `gh pr ready --undo`.
+Open the PR ready for review only when the evidence covers the head commit, as qa defines, and shows no failures. Otherwise open it as a draft and list what's missing under **Not verified**. Apply the same rule when you update a PR, with `gh pr ready` or `gh pr ready --undo`. If either fails with a Projects (classic) error, run the `markPullRequestReadyForReview` or `convertPullRequestToDraft` mutation through `gh api graphql` instead.
 
 ## Write the description
 
@@ -49,7 +49,7 @@ Add screenshots by the method that the repo's docs or `~/.agents/repos/<repo>.md
 
 1. Push the branch with the account above.
 2. Look for an open PR first: `gh pr list -R <owner>/<repo> --head "$(git branch --show-current)" --state open --json number,url,baseRefName,isDraft`. Update a match. Don't silently retarget one whose base differs.
-3. Write the body to a temporary file outside the repo. Pass it with `--body-file` to `gh pr edit <number>`, or to `gh pr create --base <base> -R <owner>/<repo>` with `--draft` when the evidence calls for it. Title the PR by the repo's title rule.
+3. Write the body to a file in a new `mktemp -d` folder, never at a fixed `/tmp` path, because parallel threads share `/tmp`. Title the PR by the repo's title rule. To create the PR, pass the file to `gh pr create --base <base> -R <owner>/<repo> --body-file <file>`, with `--draft` when the evidence calls for it. To update one, don't use `gh pr edit`, because it fails with a Projects (classic) error. PATCH it instead with `gh api -X PATCH repos/<owner>/<repo>/pulls/<number> -F body=@<file> -f title='<title>'`, then read it back.
 4. If a write times out or its result is unclear, re-read the remote state before you retry, so you never create a duplicate PR.
 5. When the T3 `link_pull_request` tool is available, link the PR to this thread.
 

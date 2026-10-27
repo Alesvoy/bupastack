@@ -35,8 +35,10 @@ Every item must hold. If one fails, fix what you're allowed to fix, or stop and 
 Sum up the merge in three lines: the PR and its head commit, the verdict and checks, and what the merge triggers. The merge request also approves a deploy to a test environment. When the merge deploys to production, ask the user to confirm that deploy, and wait.
 
 ```sh
-GH_TOKEN="$(gh auth token -u <account>)" gh pr merge <number> -R <owner>/<repo> --<squash|merge|rebase> --match-head-commit <briefed head sha>
+GH_TOKEN="$(gh auth token -u <account>)" gh pr merge <number> -R <owner>/<repo> --squash --subject "<PR title> (#<number>)" --body-file <file> --match-head-commit <briefed head sha>
 ```
+
+For a squash merge, always write the commit message yourself, as above. GitHub's default body copies every commit message onto the base branch, co-author lines included. Put the repo's squash-body text in `<file>`, or leave the file empty when the repo names none. Where the repo's rules forbid mentioning AI, the subject and body name no AI tool or model. For the `merge` or `rebase` method, drop `--subject` and `--body-file`.
 
 Use the contract's merge method. If GitHub refuses because the head moved, go back to item 2. Never use `--admin`, bypass protections, enable auto-merge, or delete the remote branch unless the contract says to. If the result is unclear, read the PR state before you retry.
 
