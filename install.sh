@@ -19,11 +19,12 @@ link() { # link <repo subfolder> <install dir>
 }
 
 link shared "$HOME/.agents/skills"
+link vendor "$HOME/.agents/skills"
 link claude "$HOME/.claude/skills"
 link codex "$HOME/.codex/skills"
 
-# Claude reads shared skills through ~/.claude/skills.
-for skill in "$repo"/shared/*/; do
+# Claude reads shared and vendor skills through ~/.claude/skills.
+for skill in "$repo"/shared/*/ "$repo"/vendor/*/; do
   name=$(basename "$skill")
   [ -e "$HOME/.claude/skills/$name" ] || ln -s "$HOME/.agents/skills/$name" "$HOME/.claude/skills/$name"
 done
