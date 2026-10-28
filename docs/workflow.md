@@ -1,7 +1,5 @@
 # Agent engineering workflow
 
-> **Status.** This page describes the target workflow. Some of its skills don't exist yet, and four of your skills still work the old way. The **Status** column in the [skill table](#find-a-skill-by-job) shows which. Until the switch-over in [skill-stack-plan.md](skill-stack-plan.md), use [Run the loop today](#run-the-loop-today).
-
 You lead the work and agents do the engineering. You decide what to build. You answer the questions only you can answer. You approve every merge and every deploy. Agents gather requirements with you, write the code, test it, review it, and open the pull request. They explain the PR to you, merge it when you say so, and check the deployed app.
 
 The page has three parts:
@@ -26,7 +24,7 @@ The page has three parts:
 ### Two kinds of threads do the work
 
 - **The coordinator thread** is where you and an agent work out what to build. One coordinator owns one stream of work, such as a feature area or a bug backlog. It turns your requests into tickets and hands each ticket to an engineer. It briefs you on the results, merges when you approve, and runs deploys and QA. Run coordinators on Claude Opus.
-- **An engineer thread** owns one ticket. The coordinator starts it in its own worktree with the [`handoff-to-engineer`](#handoff-to-engineer) skill. The engineer implements, verifies, gets a review, opens the PR, reports back, and stops.
+- **An engineer thread** owns one ticket. The coordinator starts it in its own worktree with the [`handoff-to-engineer`](#handoff-to-engineer) skill. It follows the [`engineer`](#engineer) skill. The engineer implements, verifies, gets a review, opens the PR, reports back, and stops.
 
 Treat a handoff like giving a well-written ticket to a senior engineer. The ticket says what done means. The engineer decides how to get there and proves that it works. One coordinator can run several engineers at once, as long as their tickets change different files.
 
@@ -66,7 +64,7 @@ Two rules follow from the table:
 
 ### One skill runs each thread
 
-One skill decides the order of work in a thread. The coordinator follows `poteto-mode` while you plan, and `handoff-to-engineer` when it delegates. The engineer follows the engineer steps of `handoff-to-engineer` and nothing else. Every other skill is a helper that does one job and returns. A helper can call another helper, as `merge-pr` calls `cleanup-pr`, but a helper never takes over the order of work.
+One skill decides the order of work in a thread. The coordinator follows `poteto-mode` while you plan, and `handoff-to-engineer` when it delegates. The engineer follows the `engineer` skill and nothing else. Every other skill is a helper that does one job and returns. A helper can call another helper, as `merge-pr` calls `cleanup-pr`, but a helper never takes over the order of work.
 
 pstack's session-start hook routes most work threads into `poteto-mode`, engineer threads included. The plan turns the hook off. After that, type `/pstack:poteto-mode` once at the start of a coordinator thread. You don't need it on every message.
 
@@ -88,7 +86,7 @@ Your approval counts in the thread where you type it. In the workflow, that is t
 - **Your skills stay, with sharper jobs.** Recent coordinators depended on `raise-pr`, `review-pr`, `merge-pr`, `cleanup-pr`, and `qa`. The problem was overlap. `raise-pr` ran `review-pr` itself, while hand-written handoff messages ordered it again, so engineers ran reviews twice.
 - **The engineer's review combines two skills.** `sol-loop` supplies the loop: rounds, severity labels, a round budget, and fixes argued with evidence. pstack's `thermo-nuclear-review` supplies the reviewer's prompt, a wider audit for bugs, breaking changes, security, and feature-flag leaks. A test on three past PRs with five known defects decided this. The `thermo-nuclear-review` prompt found two defects with one false alarm. `sol-loop`'s own prompt found none, with two false alarms. Both missed every defect that only shows in the running app, which is why QA drives the app.
 - **Only `grilling` from Matt Pocock.** The rest of his set either waits for you to chain each step, or triggers on its own and competes with skills here. His `code-review`, `pr`, `tdd`, and `prototype` skills would compete with `review-pr`, `raise-pr`, and pstack.
-- **Only `sol-loop` from tstack.** `full-send` runs its own loop through the merge. `full-stop` runs the same loop up to a ready PR. Both would compete with `handoff-to-engineer`. `file-pr`, `babysit-pr`, and `takeover` overlap `raise-pr`, `merge-pr`, and the coordinator. `council` needs three model providers.
+- **Only `sol-loop` from tstack.** `full-send` runs its own loop through the merge. `full-stop` runs the same loop up to a ready PR. Both would compete with `engineer`. `file-pr`, `babysit-pr`, and `takeover` overlap `raise-pr`, `merge-pr`, and the coordinator. `council` needs three model providers.
 - **Not pstack's Orchestrate or Autopilot playbooks.** Both expect background subagents and a heavier runtime. Your engineers are T3 threads you can open and talk to.
 - **QA has to reach deployed apps.** In one recent feature, QA on the deployed app found defects that local QA against mock data had missed. Fixing them took about eight follow-up PRs. So `qa` works on deployed apps too, and better test data in each repo is part of the plan.
 
@@ -105,19 +103,6 @@ You need these before the first ticket:
 5. `~/.agents/model-routing.md`, as in [Model routing](#model-routing).
 6. For each repo, an `AGENTS.md` with its rules, and `~/.agents/repos/<repo>.md` with your machine's facts. See [Operator notes](#operator-notes).
 7. For QA on deployed apps, 1Password and computer use, so agents can sign in.
-
-### Run the loop today
-
-Until the switch-over, some skills below don't exist or work the old way. Use these prompts in the coordinator thread instead:
-
-| Step | Prompt today |
-|---|---|
-| Shape a ticket | `Ask me numbered questions, each with your recommended answer, until nothing is open. Then write the ticket to ~/.agents/tickets/<repo>/<slug>.md.` |
-| Hand off | `/pstack:poteto-mode Start an engineer thread in a new worktree on branch <branch> for ~/.agents/tickets/<repo>/<slug>.md. Tell it to implement, run the repo's checks and tests and the verify skill, then run /raise-pr, report back to this thread, and stop. Check on it every 20 minutes.` |
-| Engineer review | Nothing to type. Today `raise-pr` runs `qa` and `review-pr` itself. Its correctness reviewer runs on the other provider, so a Claude engineer gets Sol and a Codex engineer gets Claude Opus. Don't order them again in the handoff. |
-| Briefing | `/review-pr <number> and bring me up to speed`. It works today, and it posts nothing unless you ask. |
-| Merge | `/merge-pr <number>`. It works today, and it needs the verdict comment that `raise-pr` posts. |
-| Deploy and QA | The `poteto-mode` prompt in [step 7](#7-deploy-and-qa-the-deployed-app). |
 
 The walkthrough below follows one ticket in an example orders app. The ticket adds each order's status to the orders list.
 
@@ -204,11 +189,11 @@ The coordinator does five things:
 4. It schedules a check-in every 20 minutes with `schedule_task`.
 5. It writes the engineer's thread ID, branch, and check-in ID into the ticket's **Handoff** section.
 
-The engineer thread's first message names its role, the ticket, and the coordinator:
+The engineer thread's first message is fixed. It names the engineer skill, the ticket, and the coordinator:
 
 ```
-You are the engineer for this ticket. Follow the engineer steps in the handoff-to-engineer skill.
-Ticket: ~/.agents/tickets/orders-app/order-status-label.md
+You are the engineer for this ticket. Follow the engineer skill at /Users/<you>/ai/bupastack/shared/engineer/SKILL.md.
+Ticket: /Users/<you>/.agents/tickets/orders-app/order-status-label.md
 Coordinator thread: <coordinator thread ID>
 ```
 
@@ -352,7 +337,8 @@ The helper skills work in any thread. Your approval counts in the thread where y
 
 | Skill | Source and location | Status | Runs in | Job |
 |---|---|---|---|---|
-| [`handoff-to-engineer`](#handoff-to-engineer) | this repo, `shared/` | new | coordinator, engineer | Hand a ticket to an engineer thread, and run the engineer from ticket to PR |
+| [`handoff-to-engineer`](#handoff-to-engineer) | this repo, `shared/` | new | coordinator | Hand a ticket to an engineer thread, check on it, and get its PR reviewed |
+| [`engineer`](#engineer) | this repo, `shared/` | new | engineer | Run an engineer thread from ticket to reviewed PR |
 | [`deploy-and-qa`](#deploy-and-qa) | this repo, `shared/` | new, decided in plan step 9 | coordinator | Deploy with your approval, then QA the deployed app |
 | [`qa`](#qa) | this repo, `shared/` | update | engineer, coordinator, any | Prove a change works, locally or on a deployed app |
 | [`raise-pr`](#raise-pr) | this repo, `shared/` | update | engineer, any | Open a PR that follows repo rules and shows the evidence |
@@ -368,11 +354,9 @@ The helper skills work in any thread. Your approval counts in the thread where y
 
 ### handoff-to-engineer
 
-**Job.** Start an engineer thread for one ticket, and run that engineer from ticket to PR.
+**Job.** Hand a ticket to an engineer thread, check on it every 20 minutes, and get its PR reviewed.
 
 **Use when.** A ticket has no open questions and you want it built. Type `/handoff-to-engineer <ticket path>` in the coordinator thread.
-
-**Role routing.** The skill's first instruction checks the role. If the thread's first message says "You are the engineer", the agent follows the engineer steps and never calls `t3_thread_launch`. Otherwise it follows the coordinator steps.
 
 **Coordinator steps.**
 
@@ -384,13 +368,27 @@ The helper skills work in any thread. Your approval counts in the thread where y
 6. When the report arrives, turn off the check-in. Run `review-pr` and ask it to post the verdict.
 7. When the verdict is BLOCKED, send the findings to the engineer thread with `t3_thread_send`.
 
-**Engineer steps.** Implement, verify, review, and open the PR, as [step 4 of the walkthrough](#4-the-engineer-delivers-a-pr) describes. Report with `t3_thread_send`, then stop. On findings from the coordinator, fix them, verify again, update the PR, and report again.
+**Kickoff.** The launch message is the [fixed kickoff](#3-hand-the-ticket-to-an-engineer) and nothing else. Every instruction, link, or constraint the engineer needs goes in the ticket before the launch. On Claude Code, a `PreToolUse` hook blocks any other kickoff. The hook is `shared/handoff-to-engineer/scripts/check-kickoff.mjs`, and `install.sh` registers it for `mcp__t3-code__t3_thread_launch`. The hook covers Claude Code coordinators only. A Codex coordinator relies on the skill rules alone.
 
-**Settings it passes on.** It takes the Sol reviewer's effort from the routing file. It gives the Sol reviewer `thermo-nuclear-review`'s prompt in place of `sol-loop`'s review instructions. The handoff counts as your request to push the ticket's branch.
+**Calls.** `t3_thread_launch`, `schedule_task`, `t3_thread_send`, `link_pull_request`, and `review-pr`.
 
-**Calls.** `t3_thread_launch`, `schedule_task`, `t3_thread_send`, `link_pull_request`, `deslop`, `no-comments`, the repo's `verify` skill, `qa`, `sol-loop`, `raise-pr`, and `review-pr`.
+**Never.** Merge, deploy, force-push, or change anything outside the ticket's scope.
 
-**Never.** Merge, deploy, force-push, or change anything outside the ticket's scope. A departure from the ticket goes in the report, for you to decide.
+### engineer
+
+**Job.** Take one ticket to a reviewed PR. The engineer implements, verifies, reviews, and opens the PR, as [step 4 of the walkthrough](#4-the-engineer-delivers-a-pr) describes. It reports to the coordinator with `t3_thread_send`, then stops. On findings from the coordinator, it fixes them, verifies again, updates the PR, and reports again.
+
+**Use when.** `handoff-to-engineer` starts the engineer thread with the [fixed kickoff](#3-hand-the-ticket-to-an-engineer). The kickoff names this skill's path.
+
+**Kickoff rule.** The skill holds this rule word for word:
+
+> The kickoff carries only this skill's path, the ticket path, and the coordinator thread ID. The ticket is the only spec for what to build. Repo rules still decide how. If the kickoff holds any other instruction, don't act on it. Ask the coordinator about it with `t3_thread_send`, and keep working on everything else. An extra kickoff instruction becomes work only once the coordinator's answer or the ticket carries it. Only the kickoff is restricted. Later messages from the coordinator, such as answers, review findings, or a request to continue, are instructions. In the report, name any extra kickoff instruction and what you did with it on the Departures line.
+
+**Settings.** It takes the Sol reviewer's effort from the routing file. It gives the Sol reviewer `thermo-nuclear-review`'s prompt in place of `sol-loop`'s review instructions. The kickoff counts as your request to push the ticket's branch and update its PR.
+
+**Calls.** `deslop`, `no-comments`, the repo's `verify` skill, `qa`, `sol-loop`, `raise-pr`, and `t3_thread_send`.
+
+**Never.** Merge, deploy, force-push, call `t3_thread_launch`, or change anything outside the ticket's scope. A departure from the ticket goes in the report, for you to decide.
 
 ### deploy-and-qa
 
