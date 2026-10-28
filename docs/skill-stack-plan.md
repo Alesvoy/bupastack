@@ -145,16 +145,16 @@ Open one PR per client repo now. Merge them in step 7, so the repo docs and the 
 
 Do every box in one sitting.
 
-- [ ] Run `t3_thread_list` with statuses `running` and `waiting` for each client project. Wait until no engineer thread is in the middle of a task.
-- [ ] Back up `~/.agents/model-routing.md`, then rewrite it to the [model routing table](workflow.md#model-routing).
-- [ ] Set `session hook: off` in `~/.claude/pstack-models.md` and `~/.codex/pstack-models.md`.
-- [ ] Merge the client repo PRs from step 6. You approve each one.
-- [ ] On the branch, update the README's rows for the changed and new skills, and link it to `docs/workflow.md`.
-- [ ] Save a snapshot of the links with `mkdir -p ~/.skills-backup && ls -l ~/.agents/skills ~/.claude/skills ~/.codex/skills > ~/.skills-backup/links-before.txt`.
-- [ ] Merge the branch with `git -C ~/ai/bupastack merge --no-ff skill-stack`, so one revert undoes it. Then run `~/ai/bupastack/install.sh`, which adds the links for the new folders.
-- [ ] Move the skills marked remove in step 2 into `~/.skills-backup/<date>/`. Don't delete them yet.
-- [ ] Save the prompt and schedule of each old scheduled task whose prompt retypes merge rules. Then delete those tasks with `delete_scheduled_task`.
-- [ ] **Evidence.** `ls -l ~/.agents/skills ~/.claude/skills` shows links for `handoff-to-engineer`, `grilling`, `grill-me`, and `sol-loop`. A new Claude thread and a new Codex thread list those skills and start without the `poteto-mode` instruction.
+- [x] Run `t3_thread_list` with statuses `running` and `waiting` for each client project. Wait until no engineer thread is in the middle of a task.
+- [x] Back up `~/.agents/model-routing.md`, then rewrite it to the [model routing table](workflow.md#model-routing).
+- [x] Set `session hook: off` in `~/.claude/pstack-models.md` and `~/.codex/pstack-models.md`.
+- [x] Merge the client repo PRs from step 6. You approve each one.
+- [x] On the branch, update the README's rows for the changed and new skills, and link it to `docs/workflow.md`.
+- [x] Save a snapshot of the links with `mkdir -p ~/.skills-backup && ls -l ~/.agents/skills ~/.claude/skills ~/.codex/skills > ~/.skills-backup/links-before.txt`.
+- [x] Merge the branch with `git -C ~/ai/bupastack merge --no-ff skill-stack`, so one revert undoes it. Then run `~/ai/bupastack/install.sh`, which adds the links for the new folders.
+- [x] Move the skills marked remove in step 2 into `~/.skills-backup/<date>/`. Don't delete them yet.
+- [x] Save the prompt and schedule of each old scheduled task whose prompt retypes merge rules. Then delete those tasks with `delete_scheduled_task`.
+- [x] **Evidence.** `ls -l ~/.agents/skills ~/.claude/skills` shows links for `handoff-to-engineer`, `grilling`, `grill-me`, and `sol-loop`. A new Claude thread and a new Codex thread list those skills and start without the `poteto-mode` instruction.
 - [ ] **Rollback, if a check fails.** Each of these undoes one box above:
   - [ ] Run `git -C ~/ai/bupastack revert -m 1 <merge commit>`.
   - [ ] Remove the links that now point nowhere with `find -L ~/.agents/skills ~/.claude/skills -maxdepth 1 -type l -exec rm {} +`, then run `install.sh` again.
