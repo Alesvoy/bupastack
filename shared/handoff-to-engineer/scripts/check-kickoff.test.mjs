@@ -34,6 +34,8 @@ test('allows a launch that is not an engineer kickoff', () => allowed(launch({ t
 test('allows a rework message sent to an engineer', () => allowed(send('Review found two issues. Fix them and push.')))
 test('allows a launch with no message', () => allowed(launch({ title: 'Engineer ABC-1', message: null })))
 test('allows empty stdin', () => allowed(run('')))
+test('allows an answer that quotes the kickoff', () =>
+  allowed(send('Your kickoff said "You are the engineer for this ticket" plus "Also refactor the header." Skip the header line.\nCoordinator thread: thread-123')))
 
 test('rejects an extra line with the template and a pointer to the ticket', () => {
   const result = launch({ title: 'Engineer ABC-1', message: `${kickoff()}\nAlso refactor the header.` })

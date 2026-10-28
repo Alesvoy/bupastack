@@ -29,10 +29,11 @@ const problems = (message) => {
   return found
 }
 
+// A send to a running engineer may quote its kickoff, so only a send that opens like one counts.
 const isKickoff = ({ tool_name, tool_input: { message, title } }) =>
-  message.includes('You are the engineer') ||
-  /^Coordinator thread:/m.test(message) ||
-  (tool_name?.endsWith('t3_thread_launch') && /^Engineer\b/.test(title ?? ''))
+  tool_name?.endsWith('t3_thread_launch')
+    ? message.includes('You are the engineer') || /^Coordinator thread:/m.test(message) || /^Engineer\b/.test(title ?? '')
+    : message.trimStart().startsWith('You are the engineer')
 
 let call
 try {
