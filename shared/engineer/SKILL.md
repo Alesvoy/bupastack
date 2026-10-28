@@ -18,7 +18,7 @@ Read the ticket, the repo's `AGENTS.md` and the docs it links, and `~/.agents/re
 3. **Review.** Run the `sol-loop` skill against the ticket's base branch. Commit each fix, then rerun the checks it affects and qa, so the evidence covers the final commit. If `sol-loop` ends stuck, carry on, and give both sides in the report's Review line.
 4. **Open the PR** with [raise-pr](../raise-pr/SKILL.md).
 5. **Wait for CI** on the head commit. Fix each failure as in step 3, update the PR with raise-pr, and wait again. When the repo has no CI, record the result of the repo's checks on the head commit instead.
-6. **Report** to the coordinator thread with `t3_thread_send`, in the format in [references/report-format.md](references/report-format.md). Then stop.
+6. **Report** to the coordinator thread that the kickoff's third line names, with `t3_thread_send`, in the format in [references/report-format.md](references/report-format.md). Then stop.
 
 When you can't make QA or CI pass, set the PR to draft, and send a blocked report.
 
@@ -28,9 +28,9 @@ When the coordinator sends findings or an answer, make the fixes as in step 3. T
 
 ## Settings
 
-- The engineer runs `sol-loop`'s Sol reviewer at the effort in the "Engineer's review with `sol-loop`" row of `~/.agents/model-routing.md`.
+- Run `sol-loop`'s Sol reviewer at the effort in the "Engineer's review with `sol-loop`" row of `~/.agents/model-routing.md`.
 - In the Sol reviewer's brief, replace `sol-loop`'s review instructions (from "Read surrounding code" to the severity line) with the prompt of pstack's `thermo-nuclear-review` skill, without its "Final Response" section. Keep `sol-loop`'s header lines, severity labels, reply format, round budget, and ledger. Tell the reviewer not to load the review-pr or qa skills, and to write any scratch files under `/tmp`, never in an evidence folder. A test on past PRs with known defects found more of them with this prompt.
-- The handoff counts as the user's request to push the ticket's branch and update its PR.
+- The kickoff counts as the user's request to push the ticket's branch and update its PR.
 
 ## Codex note
 
@@ -38,6 +38,4 @@ Codex can load the T3 tools late. When they aren't listed, call one directly, su
 
 ## Never
 
-Never merge, deploy, force-push, write or delete data in a shared environment, or change anything outside the ticket's scope. The engineer puts each departure from the ticket in its report, for the user to decide.
-
-Never call `t3_thread_launch`.
+Never merge, deploy, force-push, write or delete data in a shared environment, call `t3_thread_launch`, or change anything outside the ticket's scope. Put each departure from the ticket in your report, for the user to decide.

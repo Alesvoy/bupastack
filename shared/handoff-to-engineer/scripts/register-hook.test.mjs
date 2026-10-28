@@ -19,7 +19,8 @@ const tempSettings = (content) => {
   if (content !== undefined) writeFileSync(file, content)
   return file
 }
-const register = (file) => spawnSync(process.execPath, [script], { env: { ...process.env, CLAUDE_SETTINGS: file }, encoding: 'utf8' })
+const register = (file, nodeBin = '') =>
+  spawnSync(process.execPath, [script], { env: { ...process.env, CLAUDE_SETTINGS: file, NODE_BIN: nodeBin }, encoding: 'utf8' })
 
 test('registers one kickoff entry beside the herdr entry, however often it runs', () => {
   const file = tempSettings(JSON.stringify({ model: 'opus', hooks: { PreToolUse: [herdr], Stop: [herdr] } }))
@@ -49,4 +50,10 @@ test('aborts on invalid JSON and leaves the file alone', () => {
   assert.equal(result.status, 1)
   assert.match(result.stderr, /^Not registering the kickoff hook\. .*settings\.json is not a valid settings file: /)
   assert.equal(readFileSync(file, 'utf8'), '{ "hooks": ')
+})
+
+test('uses the node path from NODE_BIN, so a node upgrade keeps the hook working', () => {
+  const file = tempSettings('{}')
+  assert.equal(register(file, '/opt/homebrew/bin/node').status, 0)
+  assert.equal(JSON.parse(readFileSync(file, 'utf8')).hooks.PreToolUse[0].hooks[0].command, `"/opt/homebrew/bin/node" "${checker}"`)
 })

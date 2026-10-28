@@ -29,4 +29,4 @@ for skill in "$repo"/shared/*/ "$repo"/vendor/*/; do
   [ -e "$HOME/.claude/skills/$name" ] || ln -s "$HOME/.agents/skills/$name" "$HOME/.claude/skills/$name"
 done
 
-node "$repo/shared/handoff-to-engineer/scripts/register-hook.mjs"
+NODE_BIN="$(command -v node)" node "$repo/shared/handoff-to-engineer/scripts/register-hook.mjs"

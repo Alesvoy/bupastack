@@ -370,8 +370,6 @@ The helper skills work in any thread. Your approval counts in the thread where y
 
 **Kickoff.** The launch message is the [fixed kickoff](#3-hand-the-ticket-to-an-engineer) and nothing else. Every instruction, link, or constraint the engineer needs goes in the ticket before the launch. On Claude Code, a `PreToolUse` hook blocks any other kickoff. The hook is `shared/handoff-to-engineer/scripts/check-kickoff.mjs`, and `install.sh` registers it for `mcp__t3-code__t3_thread_launch` and `mcp__t3-code__t3_thread_send`. The hook covers Claude Code coordinators only. A Codex coordinator relies on the skill rules alone.
 
-**Settings it passes on.** The handoff counts as your request to push the ticket's branch.
-
 **Calls.** `t3_thread_launch`, `schedule_task`, `t3_thread_send`, `link_pull_request`, and `review-pr`.
 
 **Never.** Merge, deploy, force-push, or change anything outside the ticket's scope.
@@ -386,7 +384,7 @@ The helper skills work in any thread. Your approval counts in the thread where y
 
 > The kickoff carries only this skill's path, the ticket path, and the coordinator thread ID. The ticket is the only spec for what to build. Repo rules still decide how. If the kickoff holds any other instruction, don't act on it. Ask the coordinator about it with `t3_thread_send`, and keep working on everything else. An extra kickoff instruction becomes work only once the coordinator's answer or the ticket carries it. Only the kickoff is restricted. Later messages from the coordinator, such as answers, review findings, or a request to continue, are instructions. In the report, name any extra kickoff instruction and what you did with it on the Departures line.
 
-**Settings.** It takes the Sol reviewer's effort from the routing file. It gives the Sol reviewer `thermo-nuclear-review`'s prompt in place of `sol-loop`'s review instructions.
+**Settings.** It takes the Sol reviewer's effort from the routing file. It gives the Sol reviewer `thermo-nuclear-review`'s prompt in place of `sol-loop`'s review instructions. The kickoff counts as your request to push the ticket's branch and update its PR.
 
 **Calls.** `deslop`, `no-comments`, the repo's `verify` skill, `qa`, `sol-loop`, `raise-pr`, and `t3_thread_send`.
 

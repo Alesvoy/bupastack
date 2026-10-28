@@ -4,6 +4,7 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const file = process.env.CLAUDE_SETTINGS || join(homedir(), '.claude', 'settings.json')
+const node = process.env.NODE_BIN || process.execPath
 const script = fileURLToPath(new URL('check-kickoff.mjs', import.meta.url))
 
 let settings
@@ -23,7 +24,7 @@ settings.hooks.PreToolUse = [
   {
     matcher: 'mcp__t3-code__t3_thread_launch|mcp__t3-code__t3_thread_send',
     // Absolute node path, because apps launched from the macOS GUI often lack Homebrew on PATH.
-    hooks: [{ type: 'command', command: `"${process.execPath}" "${script}"`, timeout: 10 }],
+    hooks: [{ type: 'command', command: `"${node}" "${script}"`, timeout: 10 }],
   },
 ]
 
