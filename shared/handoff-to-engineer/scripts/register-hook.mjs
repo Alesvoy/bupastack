@@ -1,0 +1,35 @@
+import { existsSync, mkdirSync, readFileSync, renameSync, statSync, writeFileSync } from 'node:fs'
+import { homedir } from 'node:os'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const file = process.env.CLAUDE_SETTINGS || join(homedir(), '.claude', 'settings.json')
+const script = fileURLToPath(new URL('check-kickoff.mjs', import.meta.url))
+
+let settings
+try {
+  settings = existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : {}
+  if (typeof settings !== 'object' || settings === null || Array.isArray(settings)) throw new Error('not a JSON object')
+} catch (error) {
+  console.error(`Not registering the kickoff hook. ${file} is not a valid settings file: ${error.message}`)
+  process.exit(1)
+}
+
+const ours = (entry) => entry?.hooks?.some?.((hook) => String(hook?.command).includes('check-kickoff.mjs'))
+settings.hooks ??= {}
+const existing = Array.isArray(settings.hooks.PreToolUse) ? settings.hooks.PreToolUse : []
+settings.hooks.PreToolUse = [
+  ...existing.filter((entry) => !ours(entry)),
+  {
+    matcher: 'mcp__t3-code__t3_thread_launch|mcp__t3-code__t3_thread_send',
+    // Absolute node path, because apps launched from the macOS GUI often lack Homebrew on PATH.
+    hooks: [{ type: 'command', command: `"${process.execPath}" "${script}"`, timeout: 10 }],
+  },
+]
+
+mkdirSync(dirname(file), { recursive: true })
+const temp = `${file}.${process.pid}.tmp`
+const mode = existsSync(file) ? statSync(file).mode & 0o777 : 0o600
+writeFileSync(temp, `${JSON.stringify(settings, null, 2)}\n`, { mode })
+renameSync(temp, file)
+console.log(`Registered ${script} as a PreToolUse hook in ${file}`)
