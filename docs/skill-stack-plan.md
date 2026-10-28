@@ -175,13 +175,13 @@ This step replaces step 5's role routing. Engineer threads get their own `engine
   - [x] **Skill rule.** Told "also refactor the header" before a second handoff, the coordinator adds that line to the ticket's **Scope** and still sends the bare template.
   - [x] **Engineer rule.** An engineer launched from a thread without the hook, with the template plus `Also refactor the header.`, asks the coordinator about the extra line and makes no header change.
   - [x] Every sandbox thread is settled, and every sandbox PR or branch the run opened is closed.
-- [ ] Merge the PR. You approve it. Then do the boxes below in order.
-- [ ] Run `t3_thread_list` for each client project. Wait until no thread that started with the old kickoff is still open, whether it's running, waiting, or reported and not yet settled. Rework after the merge would point those engineers at a file without engineer steps.
-- [ ] Back up the settings with `cp ~/.claude/settings.json ~/.skills-backup/settings-before-engineer.json`.
-- [ ] Run `git -C ~/ai/bupastack pull`, then `~/ai/bupastack/install.sh`. Note the merge commit.
-- [ ] **Evidence.** `readlink` resolves for `~/.agents/skills/engineer` and `~/.claude/skills/engineer`. `find -L ~/.agents/skills ~/.claude/skills -maxdepth 1 -type l` prints nothing. `~/.claude/settings.json` holds exactly one `check-kickoff.mjs` entry. A new Claude thread and a new Codex thread list `engineer`.
-- [ ] Remove the hook from the sandbox's `.claude/settings.local.json`. Then remove `~/ai/bupastack-engineer-skill` and the task worktrees.
-- [ ] **Rollback, if a check fails.** Run `git -C ~/ai/bupastack revert -m 1 <merge commit>`. Remove the links that now point nowhere with `find -L ~/.agents/skills ~/.claude/skills -maxdepth 1 -type l -exec rm {} +`, then run `install.sh` again. Restore `~/.claude/settings.json` from the backup.
+- [x] Merge the PR. You approve it. Then do the boxes below in order.
+- [x] Run `t3_thread_list` for each client project. Wait until no thread that started with the old kickoff is still open, whether it's running, waiting, or reported and not yet settled. Rework after the merge would point those engineers at a file without engineer steps.
+- [x] Back up the settings with `cp ~/.claude/settings.json ~/.skills-backup/settings-before-engineer.json`.
+- [x] Run `git -C ~/ai/bupastack pull`, then `~/ai/bupastack/install.sh`. Note the merge commit. Merged as `b056ac3`.
+- [x] **Evidence.** `readlink` resolves for `~/.agents/skills/engineer` and `~/.claude/skills/engineer`. `find -L ~/.agents/skills ~/.claude/skills -maxdepth 1 -type l` prints nothing. `~/.claude/settings.json` holds exactly one `check-kickoff.mjs` entry. A new Claude thread and a new Codex thread list `engineer`.
+- [x] Remove the hook from the sandbox's `.claude/settings.local.json`. Then remove `~/ai/bupastack-engineer-skill` and the task worktrees.
+- [ ] **Rollback, if a check fails.** Run `git -C ~/ai/bupastack revert b056ac3` `. It was a squash merge, so it takes no `-m 1`. Remove the links that now point nowhere with `find -L ~/.agents/skills ~/.claude/skills -maxdepth 1 -type l -exec rm {} +`, then run `install.sh` again. Restore `~/.claude/settings.json` from the backup.
 
 Coordinator threads that are already open keep their old hooks. Only new coordinator threads get the check.
 
