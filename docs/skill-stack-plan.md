@@ -2,12 +2,12 @@
 
 This plan builds the workflow that [workflow.md](workflow.md) describes. When it's done, a coordinator thread hands a ticket to an engineer thread with one command. The engineer returns a reviewed PR with QA evidence, and the coordinator briefs you before anything merges.
 
-The plan has ten steps, numbered 0 to 9. Steps 0 to 6 build and test everything on a branch, so running agents keep the current skills. Step 7 switches over in one window. Steps 8 and 9 pilot the new flow on real tickets and decide on the last skill. Along the way the plan does these things:
+The plan has ten steps, numbered 0 to 9, and one added step, 7b. Steps 0 to 6 build and test everything on a branch, so running agents keep the current skills. Step 7 switches over in one window, and step 7b then splits the engineer skill out of `handoff-to-engineer`. Steps 8 and 9 pilot the new flow on real tickets and decide on the last skill. Along the way the plan does these things:
 
 - retires the leftover `harness-engineering-*` folders and any other skill you mark as unused
 - copies three third-party skill folders into `vendor/`
 - changes four of your skills so each does one job
-- creates `handoff-to-engineer`, and decides whether to create `deploy-and-qa`
+- creates `handoff-to-engineer` and `engineer`, and decides whether to create `deploy-and-qa`
 
 ## How to read this
 
@@ -164,6 +164,27 @@ Do every box in one sitting.
   - [ ] Revert the client repo PRs.
   - [ ] Compare `ls -l` of the skill folders with `links-before.txt`.
 
+## Step 7b. Split the engineer skill
+
+This step replaces step 5's role routing. Engineer threads get their own `engineer` skill at `shared/engineer/SKILL.md`, and `handoff-to-engineer` keeps only the coordinator's work. The coordinator sends a fixed three-line kickoff and puts everything else in the ticket. On Claude Code, a `PreToolUse` hook blocks a kickoff with any extra line. The `engineer` skill doesn't act on an extra line that gets through. The step follows Appendix B's "A pilot finds a gap". The work happens on the `engineer-skill` branch in `~/ai/bupastack-engineer-skill`, gets tested in the sandbox, and switches over the same way as step 7.
+
+- [ ] **Evidence.** In the sandbox, a coordinator follows the worktree copy of `handoff-to-engineer`. Save each artifact in `/tmp/engineer-skill-evidence/`. Every one of these holds:
+  - [ ] **Kickoff.** A diff of the engineer's first message from `t3_thread_read` against the filled template prints nothing.
+  - [ ] **Engineer skill.** Up to its first commit, the engineer's transcript reads the worktree's `shared/engineer/SKILL.md`, reads no `handoff-to-engineer/SKILL.md`, and has no `t3_thread_launch` call. The later engineer steps didn't change, so step 5's full run stands as their evidence.
+  - [ ] **Hook.** Told to call `t3_thread_launch` with the filled template plus the line `Also refactor the header.`, the coordinator tries, and the hook denies the call. The hook's message appears in the coordinator transcript, and `t3_thread_list` shows no new engineer thread.
+  - [ ] **Skill rule.** Told "also refactor the header" before a second handoff, the coordinator adds that line to the ticket's **Scope** and still sends the bare template.
+  - [ ] **Engineer rule.** An engineer launched from a thread without the hook, with the template plus `Also refactor the header.`, asks the coordinator about the extra line and makes no header change.
+  - [ ] Every sandbox thread is settled, and every sandbox PR or branch the run opened is closed.
+- [ ] Merge the PR. You approve it. Then do the boxes below in order.
+- [ ] Run `t3_thread_list` for each client project. Wait until no thread that started with the old kickoff is still open, whether it's running, waiting, or reported and not yet settled. Rework after the merge would point those engineers at a file without engineer steps.
+- [ ] Back up the settings with `cp ~/.claude/settings.json ~/.skills-backup/settings-before-engineer.json`.
+- [ ] Run `git -C ~/ai/bupastack pull`, then `~/ai/bupastack/install.sh`. Note the merge commit.
+- [ ] **Evidence.** `readlink` resolves for `~/.agents/skills/engineer` and `~/.claude/skills/engineer`. `find -L ~/.agents/skills ~/.claude/skills -maxdepth 1 -type l` prints nothing. `~/.claude/settings.json` holds exactly one `check-kickoff.mjs` entry. A new Claude thread and a new Codex thread list `engineer`.
+- [ ] Remove the hook from the sandbox's `.claude/settings.local.json`. Then remove `~/ai/bupastack-engineer-skill` and the task worktrees.
+- [ ] **Rollback, if a check fails.** Run `git -C ~/ai/bupastack revert -m 1 <merge commit>`. Remove the links that now point nowhere with `find -L ~/.agents/skills ~/.claude/skills -maxdepth 1 -type l -exec rm {} +`, then run `install.sh` again. Restore `~/.claude/settings.json` from the backup.
+
+Coordinator threads that are already open keep their old hooks. Only new coordinator threads get the check.
+
 ## Step 8. Pilot on real tickets
 
 - [ ] Hand one small real ticket per client repo to `handoff-to-engineer`. Watch each one from handoff to cleanup. You approve each merge.
@@ -184,7 +205,7 @@ Do every box in one sitting.
 
 - [ ] Every box above is checked with its evidence.
 - [ ] Every skill in the [skill table](workflow.md#find-a-skill-by-job) shows **current**, or "not built" for `deploy-and-qa`.
-- [ ] The status banner and the "Run the loop today" section are gone from `workflow.md`.
+- [x] The status banner and the "Run the loop today" section are gone from `workflow.md`.
 
 ## Appendix A. Why the plan is ordered this way
 

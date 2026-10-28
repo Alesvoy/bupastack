@@ -22,7 +22,7 @@ git clone git@github.com:Alesvoy/bupastack.git ~/ai/bupastack
 ~/ai/bupastack/install.sh
 ```
 
-The script symlinks each skill into place, so edits in the repo take effect immediately. If a skill folder already exists, the script moves it to `~/.skills-backup/<timestamp>/` before linking.
+The script symlinks each skill into place, so edits in the repo take effect immediately. If a skill folder already exists, the script moves it to `~/.skills-backup/<timestamp>/` before linking. The script also registers `shared/handoff-to-engineer/scripts/check-kickoff.mjs` as a Claude Code hook that rejects any engineer kickoff other than the fixed template.
 
 ## Skills
 
@@ -34,7 +34,8 @@ How the skills fit together, with examples: [docs/workflow.md](docs/workflow.md)
 | `raise-pr` | shared | Open or update a PR that follows the repo's rules, with QA evidence and a plain description. |
 | `review-pr` | shared | Brief you on a PR, review it with parallel reviewers, and post a merge verdict when asked. |
 | `merge-pr` | shared | Merge the briefed head of a READY PR only when you ask, then clean up. |
-| `handoff-to-engineer` | shared | Hand a groomed ticket to a new engineer thread that implements, verifies, reviews, and opens the PR. |
+| `handoff-to-engineer` | shared | Hand a groomed ticket to a new engineer thread, check on it every 20 minutes, and get its PR reviewed. |
+| `engineer` | shared | Run an engineer thread from ticket to reviewed PR. Started by `handoff-to-engineer`. Never merges or deploys. |
 | `cleanup-pr` | shared | Remove worktrees, temp files, and local branches after a merge. |
 | `qa` | shared | Prove a change works with a hands-on test plan run by a QA subagent. |
 | `sign-in-with-1password` | shared | Sign into a website with 1Password autofill through computer use. |
