@@ -181,7 +181,7 @@ This step replaces step 5's role routing. Engineer threads get their own `engine
 - [x] Run `git -C ~/ai/bupastack pull`, then `~/ai/bupastack/install.sh`. Note the merge commit. Merged as `b056ac3`.
 - [x] **Evidence.** `readlink` resolves for `~/.agents/skills/engineer` and `~/.claude/skills/engineer`. `find -L ~/.agents/skills ~/.claude/skills -maxdepth 1 -type l` prints nothing. `~/.claude/settings.json` holds exactly one `check-kickoff.mjs` entry. A new Claude thread and a new Codex thread list `engineer`.
 - [x] Remove the hook from the sandbox's `.claude/settings.local.json`. Then remove `~/ai/bupastack-engineer-skill` and the task worktrees.
-- [ ] **Rollback, if a check fails.** Run `git -C ~/ai/bupastack revert b056ac3` `. It was a squash merge, so it takes no `-m 1`. Remove the links that now point nowhere with `find -L ~/.agents/skills ~/.claude/skills -maxdepth 1 -type l -exec rm {} +`, then run `install.sh` again. Restore `~/.claude/settings.json` from the backup.
+- [ ] **Rollback, if a check fails.** Run `git -C ~/ai/bupastack revert b056ac3`. It was a squash merge, so it takes no `-m 1`. Remove the links that now point nowhere with `find -L ~/.agents/skills ~/.claude/skills -maxdepth 1 -type l -exec rm {} +`, then run `install.sh` again. Restore `~/.claude/settings.json` from the backup.
 
 Coordinator threads that are already open keep their old hooks. Only new coordinator threads get the check.
 
