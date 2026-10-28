@@ -22,7 +22,7 @@ description: Hand a ticket with no open questions from a coordinator thread to a
    Coordinator thread: <coordinator thread ID>
    ```
 
-   Send these three lines exactly. Put every instruction, link, or constraint the engineer needs into the ticket before launching. The engineer skill treats any extra line as a question back to you and doesn't act on it. On Claude Code, a `PreToolUse` hook blocks a launch or a send whose kickoff departs from these lines.
+   Send these three lines exactly. Put every instruction, link, or constraint the engineer needs into the ticket before launching. The engineer skill treats any extra line as a question back to you and doesn't act on it. On Claude Code, a `PreToolUse` hook blocks a launch whose kickoff departs from these lines, or an `Engineer` launch with no message.
 5. **Schedule the check-in** every 20 minutes with `schedule_task`. Pass `schedule: {type: "interval", everyMs: 1200000}`, `bindToCurrentThread: true`, and this prompt:
 
    ```

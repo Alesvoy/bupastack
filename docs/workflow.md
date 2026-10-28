@@ -368,7 +368,7 @@ The helper skills work in any thread. Your approval counts in the thread where y
 6. When the report arrives, turn off the check-in. Run `review-pr` and ask it to post the verdict.
 7. When the verdict is BLOCKED, send the findings to the engineer thread with `t3_thread_send`.
 
-**Kickoff.** The launch message is the [fixed kickoff](#3-hand-the-ticket-to-an-engineer) and nothing else. Every instruction, link, or constraint the engineer needs goes in the ticket before the launch. On Claude Code, a `PreToolUse` hook blocks any other kickoff. The hook is `shared/handoff-to-engineer/scripts/check-kickoff.mjs`, and `install.sh` registers it for `mcp__t3-code__t3_thread_launch` and `mcp__t3-code__t3_thread_send`. The hook covers Claude Code coordinators only. A Codex coordinator relies on the skill rules alone.
+**Kickoff.** The launch message is the [fixed kickoff](#3-hand-the-ticket-to-an-engineer) and nothing else. Every instruction, link, or constraint the engineer needs goes in the ticket before the launch. On Claude Code, a `PreToolUse` hook blocks any other kickoff. The hook is `shared/handoff-to-engineer/scripts/check-kickoff.mjs`, and `install.sh` registers it for `mcp__t3-code__t3_thread_launch`. The hook covers Claude Code coordinators only. A Codex coordinator relies on the skill rules alone.
 
 **Calls.** `t3_thread_launch`, `schedule_task`, `t3_thread_send`, `link_pull_request`, and `review-pr`.
 
