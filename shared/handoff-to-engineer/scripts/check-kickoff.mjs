@@ -12,11 +12,16 @@ const pathProblem = (name, suffix) => (path) => {
   if (!existsSync(path)) return `The ${name} "${path}" does not exist.`
 }
 
-const lines = [
-  { pattern: /^You are the engineer for this ticket\. Follow the engineer skill at (.*)\.$/, check: pathProblem('engineer skill path', '/engineer/SKILL.md') },
-  { pattern: /^Ticket: (.*)$/, check: pathProblem('ticket path', '.md') },
-  { pattern: /^Coordinator thread: (.*)$/, check: (id) => (id.trim() ? undefined : 'The coordinator thread ID is empty.') },
+const checks = [
+  pathProblem('engineer skill path', '/engineer/SKILL.md'),
+  pathProblem('ticket path', '.md'),
+  (id) => (id.trim() ? undefined : 'The coordinator thread ID is empty.'),
 ]
+const escape = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+const lines = template.split('\n').map((line, i) => ({
+  pattern: new RegExp(`^${escape(line).replace(/<[^>]+>/g, '(.*)')}$`),
+  check: checks[i],
+}))
 
 const problems = (message) => {
   const sent = message.trim().split(/\r?\n/)
@@ -29,11 +34,9 @@ const problems = (message) => {
   return found
 }
 
-// A send to a running engineer may quote its kickoff, so only a send that opens like one counts.
+const kickoffLineStart = /^(You are the engineer\b|Coordinator thread:)/m
 const isKickoff = ({ tool_name, tool_input: { message, title } }) =>
-  tool_name?.endsWith('t3_thread_launch')
-    ? message.includes('You are the engineer') || /^Coordinator thread:/m.test(message) || /^Engineer\b/.test(title ?? '')
-    : message.trimStart().startsWith('You are the engineer')
+  (String(tool_name).endsWith('t3_thread_launch') && /^Engineer\b/.test(title)) || kickoffLineStart.test(message)
 
 let call
 try {
@@ -48,7 +51,7 @@ if (found.length) {
   process.stderr.write(`Engineer kickoff rejected.
 ${found.map((p) => `- ${p}`).join('\n')}
 
-Send exactly these three lines, with only the placeholders filled:
+Send exactly these ${lines.length} lines, with only the placeholders filled:
 ${template}
 
 Put every other instruction, link, or constraint in the ticket, not the kickoff.

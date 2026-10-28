@@ -1,7 +1,9 @@
 #!/bin/sh
 # Symlink every skill in this repo into the folder its tool reads.
 # An existing skill folder (not a symlink) is moved to ~/.skills-backup first.
+# It also registers the kickoff hook in ~/.claude/settings.json, which needs node.
 set -e
+command -v node >/dev/null || { echo "install.sh needs node to register the kickoff hook. Install node and run it again." >&2; exit 1; }
 repo=$(cd "$(dirname "$0")" && pwd)
 backup="$HOME/.skills-backup/$(date +%Y%m%d-%H%M%S)"
 

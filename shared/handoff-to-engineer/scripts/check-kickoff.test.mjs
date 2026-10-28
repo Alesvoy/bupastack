@@ -35,7 +35,9 @@ test('allows a rework message sent to an engineer', () => allowed(send('Review f
 test('allows a launch with no message', () => allowed(launch({ title: 'Engineer ABC-1', message: null })))
 test('allows empty stdin', () => allowed(run('')))
 test('allows an answer that quotes the kickoff', () =>
-  allowed(send('Your kickoff said "You are the engineer for this ticket" plus "Also refactor the header." Skip the header line.\nCoordinator thread: thread-123')))
+  allowed(send('Your kickoff said "You are the engineer for this ticket" plus "Also refactor the header." Skip the header line.')))
+test('allows a launch that names the engineering coordinator', () =>
+  allowed(launch({ title: 'Engineering coordinator', message: 'You are the engineering coordinator for the orders app. Hand off the ready tickets.' })))
 
 test('rejects an extra line with the template and a pointer to the ticket', () => {
   const result = launch({ title: 'Engineer ABC-1', message: `${kickoff()}\nAlso refactor the header.` })
@@ -46,7 +48,7 @@ test('rejects an extra line with the template and a pointer to the ticket', () =
     `Engineer kickoff rejected.
 - The kickoff has 4 lines. It must have exactly 3.
 
-Send exactly these three lines, with only the placeholders filled:
+Send exactly these 3 lines, with only the placeholders filled:
 You are the engineer for this ticket. Follow the engineer skill at <engineer skill path>.
 Ticket: <ticket path>
 Coordinator thread: <coordinator thread ID>
@@ -85,3 +87,15 @@ test('rejects a ticket file that does not exist', () =>
 
 test('rejects an off-template kickoff sent with t3_thread_send', () =>
   rejected(send(`${kickoff()}\nAlso refactor the header.`), 'The kickoff has 4 lines. It must have exactly 3.'))
+
+test('rejects a send that opens with another line before the kickoff', () =>
+  rejected(send(`Please start here.\n${kickoff()}\nAlso refactor the header.`), 'The kickoff has 5 lines. It must have exactly 3.'))
+
+test('rejects a paraphrased send that has a Coordinator thread line', () =>
+  rejected(send(`You're our engineer, read ${skill}.\nTicket: ${ticket}\nCoordinator thread: t1`), 'Line 1 does not match the template.'))
+
+test('rejects an off-template kickoff whose tool_name is not a string', () =>
+  rejected(
+    run(JSON.stringify({ tool_name: 42, tool_input: { title: 'Engineer', message: `${kickoff()}\nAlso refactor the header.` } })),
+    'The kickoff has 4 lines. It must have exactly 3.',
+  ))

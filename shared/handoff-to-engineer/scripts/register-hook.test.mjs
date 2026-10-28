@@ -57,3 +57,16 @@ test('uses the node path from NODE_BIN, so a node upgrade keeps the hook working
   assert.equal(register(file, '/opt/homebrew/bin/node').status, 0)
   assert.equal(JSON.parse(readFileSync(file, 'utf8')).hooks.PreToolUse[0].hooks[0].command, `"/opt/homebrew/bin/node" "${checker}"`)
 })
+
+for (const [shape, content] of [
+  ['a hooks value that is not an object', '{"hooks":"oops"}'],
+  ['a PreToolUse value that is not an array', '{"hooks":{"PreToolUse":{"matcher":"x"}}}'],
+]) {
+  test(`aborts on ${shape} and leaves the file alone`, () => {
+    const file = tempSettings(content)
+    const result = register(file)
+    assert.equal(result.status, 1)
+    assert.match(result.stderr, /^Not registering the kickoff hook\. .*settings\.json is not a valid settings file: /)
+    assert.equal(readFileSync(file, 'utf8'), content)
+  })
+}
