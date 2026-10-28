@@ -32,7 +32,7 @@ How the skills fit together, with examples: [docs/workflow.md](docs/workflow.md)
 | Skill | Folder | Purpose |
 |---|---|---|
 | `raise-pr` | shared | Open or update a PR that follows the repo's rules, with QA evidence and a plain description. |
-| `review-pr` | shared | Review a PR or branch with parallel reviewers and give a merge verdict. |
+| `review-pr` | shared | Brief you on a PR, review it with parallel reviewers, and post a merge verdict when asked. |
 | `merge-pr` | shared | Merge the briefed head of a READY PR only when you ask, then clean up. |
 | `handoff-to-engineer` | shared | Hand a groomed ticket to a new engineer thread that implements, verifies, reviews, and opens the PR. |
 | `cleanup-pr` | shared | Remove worktrees, temp files, and local branches after a merge. |
