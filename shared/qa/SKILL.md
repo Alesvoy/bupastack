@@ -52,14 +52,14 @@ Hand the plan to a QA subagent on the "QA, local and deployed" row of `~/.agents
 - The repo skill or script for driving the UI and for sign-in, by name. Without a repo sign-in skill, use [sign-in-with-1password](../sign-in-with-1password/SKILL.md).
 - The full test plan, and the evidence folder.
 - Limits: no code edits, commits, pushes, deploys, or data changes beyond what the plan allows. Reveal no credentials.
-- Cleanup: stop any dev server or browser session it started, and report anything left running.
+- Cleanup, before it reports: close every browser tab and window it opened, including tabs in the user's own browser, close every Playwright browser and context it launched, end any computer-use session, and stop any dev server it started. Never close tabs or windows it didn't open. Its report lists what it closed and anything it couldn't close.
 - The report format: per scenario `pass`, `fail`, `blocked`, or `plan mismatch` (the app works but differs from the plan), what it saw, and the evidence file path. For each defect, the steps to reproduce, the expected and actual results, and the evidence.
 
 When sign-in needs the user, such as for MFA, a vault unlock, or a phone approval, relay the subagent's question to the user and wait.
 
 ## Check the evidence
 
-Before you report, run `lsof +D <worktree>`. Stop each process the QA run started that still holds the worktree, such as a dev server or a browser, so cleanup-pr can remove the worktree later. Don't relay a pass you haven't checked. Open the cited screenshots or logs and confirm they show the claimed result for the commit under test. Re-run or re-delegate scenarios whose evidence is missing or unconvincing. Before you report a fail as a defect, check the intended behavior in the ticket, PR, commits, and code. A fail caused by a wrong expectation is a plan error, not a defect. Confirm that a defect also fails on the base branch before you call it pre-existing.
+Before you report, check the subagent's cleanup list, and close any tab or window it opened and left behind. Then run `lsof +D <worktree>`. Stop each process the QA run started that still holds the worktree, such as a dev server or a browser, so cleanup-pr can remove the worktree later. Don't relay a pass you haven't checked. Open the cited screenshots or logs and confirm they show the claimed result for the commit under test. Re-run or re-delegate scenarios whose evidence is missing or unconvincing. Before you report a fail as a defect, check the intended behavior in the ticket, PR, commits, and code. A fail caused by a wrong expectation is a plan error, not a defect. Confirm that a defect also fails on the base branch before you call it pre-existing.
 
 ## Report
 

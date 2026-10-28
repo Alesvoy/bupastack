@@ -26,11 +26,15 @@ The script symlinks each skill into place, so edits in the repo take effect imme
 
 ## Skills
 
+How the skills fit together, with examples: [docs/workflow.md](docs/workflow.md).
+
+
 | Skill | Folder | Purpose |
 |---|---|---|
-| `raise-pr` | shared | Open or update a PR that is safe to merge, after running the repo's checks, QA, and a review. |
+| `raise-pr` | shared | Open or update a PR that follows the repo's rules, with QA evidence and a plain description. |
 | `review-pr` | shared | Review a PR or branch with parallel reviewers and give a merge verdict. |
-| `merge-pr` | shared | Merge a PR only when the user asks and every check is green. |
+| `merge-pr` | shared | Merge the briefed head of a READY PR only when you ask, then clean up. |
+| `handoff-to-engineer` | shared | Hand a groomed ticket to a new engineer thread that implements, verifies, reviews, and opens the PR. |
 | `cleanup-pr` | shared | Remove worktrees, temp files, and local branches after a merge. |
 | `qa` | shared | Prove a change works with a hands-on test plan run by a QA subagent. |
 | `sign-in-with-1password` | shared | Sign into a website with 1Password autofill through computer use. |
