@@ -53,10 +53,10 @@ Some client repos require screenshots attached to the PR, and agents had no way 
 ## Step 2. Choose what to retire
 
 - [x] On the branch, delete `harness-engineering-project-bootstrap/` and `harness-engineering-track-task/` with `git rm -r`. Both hold only compiled Python caches from retired skills.
-- [ ] List every skill in `~/.agents/skills`, `~/.claude/skills`, and `~/.codex/skills` that the [skill table](workflow.md#find-a-skill-by-job) doesn't name. Save the list in `~/.agents/repos/readiness.md`, and mark each one keep or remove. Step 7 removes the marked ones.
+- [x] List every skill in `~/.agents/skills`, `~/.claude/skills`, and `~/.codex/skills` that the [skill table](workflow.md#find-a-skill-by-job) doesn't name. Save the list in `~/.agents/repos/readiness.md`, and mark each one keep or remove. Step 7 removes the marked ones.
 - [x] Delete the global memory note that tells agents to use the retired harness-engineering skills, and its line in the memory index, in `~/.claude/projects/<home>/memory/`. It points at skills that no longer exist, so deleting it now is safe.
-- [ ] Decide the global memory note that tells agents to use GitHub MCP tools instead of `gh`. Every PR skill uses `gh`, so the note conflicts with them.
-- [ ] **Evidence.** `git ls-files | grep harness` prints nothing on the branch. `grep -ri harness-engineering` in the memory folder prints nothing. The skill list has a mark on every line.
+- [x] Decide the global memory note that tells agents to use GitHub MCP tools instead of `gh`. Every PR skill uses `gh`, so the note conflicts with them.
+- [x] **Evidence.** `git ls-files | grep harness` prints nothing on the branch. `grep -ri harness-engineering` in the memory folder prints nothing. The skill list has a mark on every line.
 
 ## Step 3. Copy the third-party skills into `vendor/`
 
