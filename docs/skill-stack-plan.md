@@ -168,13 +168,13 @@ Do every box in one sitting.
 
 This step replaces step 5's role routing. Engineer threads get their own `engineer` skill at `shared/engineer/SKILL.md`, and `handoff-to-engineer` keeps only the coordinator's work. The coordinator sends a fixed three-line kickoff and puts everything else in the ticket. On Claude Code, a `PreToolUse` hook blocks a kickoff with any extra line. The `engineer` skill doesn't act on an extra line that gets through. The step follows Appendix B's "A pilot finds a gap". The work happens on the `engineer-skill` branch in `~/ai/bupastack-engineer-skill`, gets tested in the sandbox, and switches over the same way as step 7.
 
-- [ ] **Evidence.** In the sandbox, a coordinator follows the worktree copy of `handoff-to-engineer`. Save each artifact in `/tmp/engineer-skill-evidence/`. Every one of these holds:
-  - [ ] **Kickoff.** A diff of the engineer's first message from `t3_thread_read` against the filled template prints nothing.
-  - [ ] **Engineer skill.** Up to its first commit, the engineer's transcript reads the worktree's `shared/engineer/SKILL.md`, reads no `handoff-to-engineer/SKILL.md`, and has no `t3_thread_launch` call. The later engineer steps didn't change, so step 5's full run stands as their evidence.
-  - [ ] **Hook.** Told to call `t3_thread_launch` with the filled template plus the line `Also refactor the header.`, the coordinator tries, and the hook denies the call. The hook's message appears in the coordinator transcript, and `t3_thread_list` shows no new engineer thread.
-  - [ ] **Skill rule.** Told "also refactor the header" before a second handoff, the coordinator adds that line to the ticket's **Scope** and still sends the bare template.
-  - [ ] **Engineer rule.** An engineer launched from a thread without the hook, with the template plus `Also refactor the header.`, asks the coordinator about the extra line and makes no header change.
-  - [ ] Every sandbox thread is settled, and every sandbox PR or branch the run opened is closed.
+- [x] **Evidence.** In the sandbox, a coordinator follows the worktree copy of `handoff-to-engineer`. Save each artifact in `/tmp/engineer-skill-evidence/`. Every one of these holds:
+  - [x] **Kickoff.** A diff of the engineer's first message from `t3_thread_read` against the filled template prints nothing.
+  - [x] **Engineer skill.** Up to its first commit, the engineer's transcript reads the worktree's `shared/engineer/SKILL.md`, reads no `handoff-to-engineer/SKILL.md`, and has no `t3_thread_launch` call. The later engineer steps didn't change, so step 5's full run stands as their evidence.
+  - [x] **Hook.** Told to call `t3_thread_launch` with the filled template plus the line `Also refactor the header.`, the coordinator tries, and the hook denies the call. The hook's message appears in the coordinator transcript, and `t3_thread_list` shows no new engineer thread.
+  - [x] **Skill rule.** Told "also refactor the header" before a second handoff, the coordinator adds that line to the ticket's **Scope** and still sends the bare template.
+  - [x] **Engineer rule.** An engineer launched from a thread without the hook, with the template plus `Also refactor the header.`, asks the coordinator about the extra line and makes no header change.
+  - [x] Every sandbox thread is settled, and every sandbox PR or branch the run opened is closed.
 - [ ] Merge the PR. You approve it. Then do the boxes below in order.
 - [ ] Run `t3_thread_list` for each client project. Wait until no thread that started with the old kickoff is still open, whether it's running, waiting, or reported and not yet settled. Rework after the merge would point those engineers at a file without engineer steps.
 - [ ] Back up the settings with `cp ~/.claude/settings.json ~/.skills-backup/settings-before-engineer.json`.

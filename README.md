@@ -24,6 +24,8 @@ git clone git@github.com:Alesvoy/bupastack.git ~/ai/bupastack
 
 The script symlinks each skill into place, so edits in the repo take effect immediately. If a skill folder already exists, the script moves it to `~/.skills-backup/<timestamp>/` before linking. The script also registers `shared/handoff-to-engineer/scripts/check-kickoff.mjs` as a Claude Code hook that rejects any engineer kickoff other than the fixed template.
 
+Run the hook's tests with `node --test 'shared/handoff-to-engineer/scripts/*.test.mjs'`.
+
 ## Skills
 
 How the skills fit together, with examples: [docs/workflow.md](docs/workflow.md).

@@ -192,8 +192,8 @@ The coordinator does five things:
 The engineer thread's first message is fixed. It names the engineer skill, the ticket, and the coordinator:
 
 ```
-You are the engineer for this ticket. Follow the engineer skill at /Users/alesvoy/ai/bupastack/shared/engineer/SKILL.md.
-Ticket: /Users/alesvoy/.agents/tickets/orders-app/order-status-label.md
+You are the engineer for this ticket. Follow the engineer skill at /Users/<you>/ai/bupastack/shared/engineer/SKILL.md.
+Ticket: /Users/<you>/.agents/tickets/orders-app/order-status-label.md
 Coordinator thread: <coordinator thread ID>
 ```
 
