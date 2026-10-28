@@ -19,7 +19,6 @@ const kickoff = ({ skillPath = skill, ticketPath = ticket, thread = 'thread-123'
 
 const run = (input) => spawnSync(process.execPath, [script], { input, encoding: 'utf8' })
 const launch = (tool_input) => run(JSON.stringify({ tool_name: 'mcp__t3-code__t3_thread_launch', tool_input }))
-const send = (message) => run(JSON.stringify({ tool_name: 'mcp__t3-code__t3_thread_send', tool_input: { threadId: 't', message } }))
 
 const allowed = (result) => assert.deepEqual([result.status, result.stdout, result.stderr], [0, '', ''])
 const rejected = (result, problem) => {
@@ -31,11 +30,8 @@ const rejected = (result, problem) => {
 test('allows a valid kickoff', () => allowed(launch({ title: 'Engineer ABC-1', message: kickoff() })))
 test('allows a valid kickoff with CRLF line endings', () => allowed(launch({ title: 'Engineer', message: kickoff().replaceAll('\n', '\r\n') })))
 test('allows a launch that is not an engineer kickoff', () => allowed(launch({ title: 'Research', message: 'Look into the flaky test.' })))
-test('allows a rework message sent to an engineer', () => allowed(send('Review found two issues. Fix them and push.')))
-test('allows a launch with no message', () => allowed(launch({ title: 'Engineer ABC-1', message: null })))
+test('allows a launch with no message that is not an engineer kickoff', () => allowed(launch({ title: 'Research' })))
 test('allows empty stdin', () => allowed(run('')))
-test('allows an answer that quotes the kickoff', () =>
-  allowed(send('Your kickoff said "You are the engineer for this ticket" plus "Also refactor the header." Skip the header line.')))
 test('allows a launch that names the engineering coordinator', () =>
   allowed(launch({ title: 'Engineering coordinator', message: 'You are the engineering coordinator for the orders app. Hand off the ready tickets.' })))
 
@@ -85,17 +81,16 @@ test('rejects a ticket file that does not exist', () =>
     `The ticket path "${join(dir, 'missing.md')}" does not exist.`,
   ))
 
-test('rejects an off-template kickoff sent with t3_thread_send', () =>
-  rejected(send(`${kickoff()}\nAlso refactor the header.`), 'The kickoff has 4 lines. It must have exactly 3.'))
+test('rejects an indented kickoff under a non-Engineer title', () =>
+  rejected(launch({ title: 'Build it', message: kickoff().replace(/^/gm, '  ') }), 'Line 1 does not match the template.'))
 
-test('rejects a send that opens with another line before the kickoff', () =>
-  rejected(send(`Please start here.\n${kickoff()}\nAlso refactor the header.`), 'The kickoff has 5 lines. It must have exactly 3.'))
-
-test('rejects a paraphrased send that has a Coordinator thread line', () =>
-  rejected(send(`You're our engineer, read ${skill}.\nTicket: ${ticket}\nCoordinator thread: t1`), 'Line 1 does not match the template.'))
-
-test('rejects an off-template kickoff whose tool_name is not a string', () =>
+test('rejects a kickoff that starts mid-line under a non-Engineer title', () =>
   rejected(
-    run(JSON.stringify({ tool_name: 42, tool_input: { title: 'Engineer', message: `${kickoff()}\nAlso refactor the header.` } })),
-    'The kickoff has 4 lines. It must have exactly 3.',
+    launch({ title: 'Build it', message: `Please start. You are the engineer for this ticket. Follow the engineer skill at ${skill}. Ticket: ${ticket}` }),
+    'Line 1 does not match the template.',
   ))
+
+for (const message of [null, '  \n']) {
+  test(`rejects an Engineer launch whose message is ${JSON.stringify(message)}`, () =>
+    rejected(launch({ title: 'Engineer ABC-1', message }), 'The kickoff must be in the launch message.'))
+}

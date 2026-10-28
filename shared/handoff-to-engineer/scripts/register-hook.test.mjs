@@ -8,11 +8,11 @@ import { fileURLToPath } from 'node:url'
 
 const script = fileURLToPath(new URL('register-hook.mjs', import.meta.url))
 const checker = fileURLToPath(new URL('check-kickoff.mjs', import.meta.url))
-const herdr = { hooks: [{ type: 'command', command: '/Users/alesvoy/.local/libexec/herdr-agent-notify claude', timeout: 5 }] }
-const kickoffEntry = {
-  matcher: 'mcp__t3-code__t3_thread_launch|mcp__t3-code__t3_thread_send',
-  hooks: [{ type: 'command', command: `"${process.execPath}" "${checker}"`, timeout: 10 }],
-}
+const otherHook = { type: 'command', command: '/usr/local/bin/other-hook', timeout: 5 }
+const other = { hooks: [otherHook] }
+const kickoffHook = { type: 'command', command: `"${process.execPath}" "${checker}"`, timeout: 10 }
+const kickoffEntry = { matcher: 'mcp__t3-code__t3_thread_launch', hooks: [kickoffHook] }
+const oldMatcher = 'mcp__t3-code__t3_thread_launch|mcp__t3-code__t3_thread_send'
 
 const tempSettings = (content) => {
   const file = join(mkdtempSync(join(tmpdir(), 'register-hook-')), 'settings.json')
@@ -22,13 +22,25 @@ const tempSettings = (content) => {
 const register = (file, nodeBin = '') =>
   spawnSync(process.execPath, [script], { env: { ...process.env, CLAUDE_SETTINGS: file, NODE_BIN: nodeBin }, encoding: 'utf8' })
 
-test('registers one kickoff entry beside the herdr entry, however often it runs', () => {
-  const file = tempSettings(JSON.stringify({ model: 'opus', hooks: { PreToolUse: [herdr], Stop: [herdr] } }))
+test('registers one kickoff entry beside an unrelated entry, however often it runs', () => {
+  const file = tempSettings(JSON.stringify({ model: 'opus', hooks: { PreToolUse: [other], Stop: [other] } }))
   assert.equal(register(file).status, 0)
   assert.equal(register(file).status, 0)
   const text = readFileSync(file, 'utf8')
   assert.ok(text.endsWith('}\n'))
-  assert.deepEqual(JSON.parse(text), { model: 'opus', hooks: { PreToolUse: [herdr, kickoffEntry], Stop: [herdr] } })
+  assert.deepEqual(JSON.parse(text), { model: 'opus', hooks: { PreToolUse: [other, kickoffEntry], Stop: [other] } })
+})
+
+test('keeps an unrelated hook that shares an entry with an old kickoff hook', () => {
+  const file = tempSettings(JSON.stringify({ hooks: { PreToolUse: [{ matcher: oldMatcher, hooks: [otherHook, kickoffHook] }] } }))
+  assert.equal(register(file).status, 0)
+  assert.deepEqual(JSON.parse(readFileSync(file, 'utf8')), { hooks: { PreToolUse: [{ matcher: oldMatcher, hooks: [otherHook] }, kickoffEntry] } })
+})
+
+test('migrates an old launch-and-send kickoff entry to one launch-only entry', () => {
+  const file = tempSettings(JSON.stringify({ hooks: { PreToolUse: [{ matcher: oldMatcher, hooks: [kickoffHook] }] } }))
+  assert.equal(register(file).status, 0)
+  assert.deepEqual(JSON.parse(readFileSync(file, 'utf8')), { hooks: { PreToolUse: [kickoffEntry] } })
 })
 
 test('keeps the settings file private', () => {

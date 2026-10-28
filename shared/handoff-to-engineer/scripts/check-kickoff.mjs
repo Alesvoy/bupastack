@@ -22,9 +22,10 @@ const lines = template.split('\n').map((line, i) => ({
   pattern: new RegExp(`^${escape(line).replace(/<[^>]+>/g, '(.*)')}$`),
   check: checks[i],
 }))
+if (checks.length !== lines.length) throw new Error('check-kickoff.mjs needs one check per template line.')
 
 const problems = (message) => {
-  const sent = message.trim().split(/\r?\n/)
+  const sent = message.trimEnd().split(/\r?\n/)
   const found = sent.length === lines.length ? [] : [`The kickoff has ${sent.length} lines. It must have exactly ${lines.length}.`]
   lines.forEach(({ pattern, check }, i) => {
     const match = sent[i]?.match(pattern)
@@ -34,19 +35,17 @@ const problems = (message) => {
   return found
 }
 
-const kickoffLineStart = /^(You are the engineer\b|Coordinator thread:)/m
-const isKickoff = ({ tool_name, tool_input: { message, title } }) =>
-  (String(tool_name).endsWith('t3_thread_launch') && /^Engineer\b/.test(title)) || kickoffLineStart.test(message)
-
 let call
 try {
   call = JSON.parse(readFileSync(0, 'utf8'))
 } catch {
   process.exit(0)
 }
-if (typeof call?.tool_input?.message !== 'string' || !isKickoff(call)) process.exit(0)
+const { title, message } = call?.tool_input ?? {}
+const text = typeof message === 'string' ? message : ''
+if (!/^Engineer\b/.test(title) && !/You are the engineer\b/.test(text) && !/^\s*Coordinator thread:/m.test(text)) process.exit(0)
 
-const found = problems(call.tool_input.message)
+const found = text.trim() ? problems(text) : ['The kickoff must be in the launch message.']
 if (found.length) {
   process.stderr.write(`Engineer kickoff rejected.
 ${found.map((p) => `- ${p}`).join('\n')}

@@ -12,19 +12,25 @@ let settings
 try {
   settings = existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : {}
   if (!isObject(settings)) throw new Error('not a JSON object')
-  if (!isObject(settings.hooks ?? {})) throw new Error('"hooks" is not a JSON object')
-  if (!Array.isArray(settings.hooks?.PreToolUse ?? [])) throw new Error('"hooks.PreToolUse" is not an array')
+  settings.hooks ??= {}
+  if (!isObject(settings.hooks)) throw new Error('"hooks" is not a JSON object')
+  settings.hooks.PreToolUse ??= []
+  if (!Array.isArray(settings.hooks.PreToolUse)) throw new Error('"hooks.PreToolUse" is not an array')
 } catch (error) {
   console.error(`Not registering the kickoff hook. ${file} is not a valid settings file: ${error.message}`)
   process.exit(1)
 }
 
-const ours = (entry) => entry?.hooks?.some?.((hook) => String(hook?.command).includes('check-kickoff.mjs'))
-settings.hooks ??= {}
+const ours = (hook) => String(hook?.command).includes('check-kickoff.mjs')
+const withoutOurs = (entry) => {
+  if (!Array.isArray(entry?.hooks) || !entry.hooks.some(ours)) return [entry]
+  const hooks = entry.hooks.filter((hook) => !ours(hook))
+  return hooks.length ? [{ ...entry, hooks }] : []
+}
 settings.hooks.PreToolUse = [
-  ...(settings.hooks.PreToolUse ?? []).filter((entry) => !ours(entry)),
+  ...settings.hooks.PreToolUse.flatMap(withoutOurs),
   {
-    matcher: 'mcp__t3-code__t3_thread_launch|mcp__t3-code__t3_thread_send',
+    matcher: 'mcp__t3-code__t3_thread_launch',
     // Absolute node path, because apps launched from the macOS GUI often lack Homebrew on PATH.
     hooks: [{ type: 'command', command: `"${node}" "${script}"`, timeout: 10 }],
   },
