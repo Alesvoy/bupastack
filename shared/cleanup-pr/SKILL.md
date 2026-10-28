@@ -34,7 +34,7 @@ If the main checkout is on the completed task branch and clean, switch it to the
 
 1. Stop only processes and browser sessions the task owns, such as a dev server it started. Move the shell to a surviving checkout before removing its directory.
 2. Delete only the inventoried disposable paths. Check directory contents and symlinks before recursive deletion.
-3. Remove each safe linked worktree with `git worktree remove <exact-path>`. Do not use `--force`, delete registered worktrees by hand, or run a blanket `git clean`. If removal fails, keep the worktree and report why.
+3. Remove each safe linked worktree with `git worktree remove <exact-path>`. Do not use `--force`, delete registered worktrees by hand, or run a blanket `git clean`. If removal fails, keep the worktree and report why. When a process from another session or app, such as a Codex tool server, still holds a worktree, keep it, and add a line with its path, the repo, and the PR number to `~/.agents/pending-cleanup.md`. A later run of this skill retries each listed worktree, and removes its line once the worktree is gone.
 4. Delete the task's local branches with `git branch -d <branch>`. If it refuses only because a squash merge changed ancestry, `git branch -D` is allowed for the exact verified merged head with no worktree using it. Never delete the base branch or unrelated branches.
 
 ## Verify And Report
