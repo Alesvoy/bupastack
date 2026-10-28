@@ -5,7 +5,7 @@ description: Clean up a completed PR task after its merge is confirmed. Remove t
 
 # Cleanup PR
 
-Read the repo's `AGENTS.md` (or `CLAUDE.md`) and its post-merge policy, if any, for the remote, GitHub account, base branch, and the repo's temporary-file locations. Repo rules win over this skill. If the repo names a `gh` account, prefix each `gh` call with `GH_TOKEN="$(gh auth token -u <account>)"` and pass git the one-off credential helper shown below. If the repo's git remote uses SSH, use plain `git` and skip the credential helper.
+Read the repo's `AGENTS.md` (or `CLAUDE.md`) and its post-merge policy, if any, for the remote, GitHub account, base branch, and the repo's temporary-file locations. Then read `~/.agents/repos/<repo>.md` when it exists. Repo rules win over this skill. Take the GitHub account from `~/.agents/repos/<repo>.md`, or from the repo's docs when that file doesn't exist. Prefix every `gh` call with `GH_TOKEN="$(gh auth token -u <account>)"`, as the commands below show, even when another account is active. Never run `gh auth switch`, and never print a token. For `git` over https, pass the one-off credential helper shown below. If the repo's git remote uses SSH, use plain `git` and skip the credential helper.
 
 A requested merge includes this cleanup once merged; an explicit cleanup request also authorizes these task-scoped local removals. This skill does not approve, merge, deploy, or delete remote branches.
 
@@ -14,7 +14,7 @@ A requested merge includes this cleanup once merged; an explicit cleanup request
 1. Resolve the PR from the request or task history and read its state:
 
    ```sh
-   gh pr view <number> -R <owner>/<repo> --json url,state,mergedAt,mergeCommit,headRefName,headRefOid,baseRefName
+   GH_TOKEN="$(gh auth token -u <account>)" gh pr view <number> -R <owner>/<repo> --json url,state,mergedAt,mergeCommit,headRefName,headRefOid,baseRefName
    git -c credential.helper= -c credential.helper='!f() { echo username=x-access-token; echo "password=$(gh auth token -u <account>)"; }; f' fetch origin
    git worktree list --porcelain
    ```
@@ -34,7 +34,7 @@ If the main checkout is on the completed task branch and clean, switch it to the
 
 1. Stop only processes and browser sessions the task owns, such as a dev server it started. Move the shell to a surviving checkout before removing its directory.
 2. Delete only the inventoried disposable paths. Check directory contents and symlinks before recursive deletion.
-3. Remove each safe linked worktree with `git worktree remove <exact-path>`. Do not use `--force`, delete registered worktrees by hand, or run a blanket `git clean`. If removal fails, keep the worktree and report why.
+3. Remove each safe linked worktree with `git worktree remove <exact-path>`. Do not use `--force`, delete registered worktrees by hand, or run a blanket `git clean`. If removal fails, keep the worktree and report why. When a process from another session or app, such as a Codex tool server, still holds a worktree, keep it, and add a line with its path, the repo, and the PR number to `~/.agents/pending-cleanup.md`. A later run of this skill retries each listed worktree, and removes its line once the worktree is gone.
 4. Delete the task's local branches with `git branch -d <branch>`. If it refuses only because a squash merge changed ancestry, `git branch -D` is allowed for the exact verified merged head with no worktree using it. Never delete the base branch or unrelated branches.
 
 ## Verify And Report

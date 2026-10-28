@@ -9,6 +9,7 @@ Each top-level folder installs into one directory:
 | Folder | Installs into | Read by |
 |---|---|---|
 | `shared/` | `~/.agents/skills/` | Codex, and Claude through symlinks in `~/.claude/skills/` |
+| `vendor/` | `~/.agents/skills/` | Codex, and Claude through symlinks in `~/.claude/skills/` |
 | `claude/` | `~/.claude/skills/` | Claude Code |
 | `codex/` | `~/.codex/skills/` | Codex |
 
@@ -25,14 +26,21 @@ The script symlinks each skill into place, so edits in the repo take effect imme
 
 ## Skills
 
+How the skills fit together, with examples: [docs/workflow.md](docs/workflow.md).
+
+
 | Skill | Folder | Purpose |
 |---|---|---|
-| `raise-pr` | shared | Open or update a PR that is safe to merge, after running the repo's checks, QA, and a review. |
-| `review-pr` | shared | Review a PR or branch with parallel reviewers and give a merge verdict. |
-| `merge-pr` | shared | Merge a PR only when the user asks and every check is green. |
+| `raise-pr` | shared | Open or update a PR that follows the repo's rules, with QA evidence and a plain description. |
+| `review-pr` | shared | Brief you on a PR, review it with parallel reviewers, and post a merge verdict when asked. |
+| `merge-pr` | shared | Merge the briefed head of a READY PR only when you ask, then clean up. |
+| `handoff-to-engineer` | shared | Hand a groomed ticket to a new engineer thread that implements, verifies, reviews, and opens the PR. |
 | `cleanup-pr` | shared | Remove worktrees, temp files, and local branches after a merge. |
 | `qa` | shared | Prove a change works with a hands-on test plan run by a QA subagent. |
 | `sign-in-with-1password` | shared | Sign into a website with 1Password autofill through computer use. |
+| `grilling` | vendor | Question you in numbered rounds, each with a recommended answer, until a plan has no open decisions. From [mattpocock/skills](https://github.com/mattpocock/skills). |
+| `grill-me` | vendor | Run `grilling` when you type `/grill-me`. From [mattpocock/skills](https://github.com/mattpocock/skills). |
+| `sol-loop` | vendor | Review a change in rounds with a Sol reviewer, fixing what is valid. From [t3dotgg/tstack](https://github.com/t3dotgg/tstack). |
 | `brainstorm-design` | claude, codex | Frame the problem, gather references, and build several design options in parallel. |
 | `build-design` | claude, codex | Build one UI design from a direction and reference images, then review it once. |
 | `design-previews` | claude, codex | Open each design option in its own browser tab and record the user's choice. |
